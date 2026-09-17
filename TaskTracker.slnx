@@ -1,0 +1,47 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/gateway/gateway.csproj" />
+  </Folder>
+  <Folder Name="/src/microservices/" />
+  <Folder Name="/src/microservices/Notifications/">
+    <Project Path="src/microservices/Notifications/Notifications.API/Notifications.API.csproj" />
+    <Project Path="src/microservices/Notifications/Notifications.Application/Notifications.Application.csproj" />
+    <Project Path="src/microservices/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
+    <Project Path="src/microservices/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/microservices/Tasks/">
+    <Project Path="src/microservices/Tasks/Tasks.API/Tasks.API.csproj" />
+    <Project Path="src/microservices/Tasks/Tasks.Application/Tasks.Application.csproj" />
+    <Project Path="src/microservices/Tasks/Tasks.Domain/Tasks.Domain.csproj" />
+    <Project Path="src/microservices/Tasks/Tasks.Infrastructure/Tasks.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/microservices/Users/">
+    <Project Path="src/microservices/Users/Users.API/Users.API.csproj" />
+    <Project Path="src/microservices/Users/Users.Application/Users.Application.csproj" />
+    <Project Path="src/microservices/Users/Users.Domain/Users.Domain.csproj" />
+    <Project Path="src/microservices/Users/Users.Infrastructure/Users.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/microservices/" />
+  <Folder Name="/tests/microservices/Notifications/">
+    <Project Path="tests/microservices/Notifications/Notifications.API.Tests/Notifications.API.Tests.csproj" />
+    <Project Path="tests/microservices/Notifications/Notifications.Application.Tests/Notifications.Application.Tests.csproj" />
+    <Project Path="tests/microservices/Notifications/Notifications.Architecture.Tests/Notifications.Architecture.Tests.csproj" />
+    <Project Path="tests/microservices/Notifications/Notifications.Domain.Tests/Notifications.Domain.Tests.csproj" />
+    <Project Path="tests/microservices/Notifications/Notifications.Infrastructure.Tests/Notifications.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/microservices/Tasks/">
+    <Project Path="tests/microservices/Tasks/Tasks.API.Tests/Tasks.API.Tests.csproj" />
+    <Project Path="tests/microservices/Tasks/Tasks.Application.Tests/Tasks.Application.Tests.csproj" />
+    <Project Path="tests/microservices/Tasks/Tasks.Architecture.Tests/Tasks.Architecture.Tests.csproj" />
+    <Project Path="tests/microservices/Tasks/Tasks.Domain.Tests/Tasks.Domain.Tests.csproj" />
+    <Project Path="tests/microservices/Tasks/Tasks.Infrastructure.Tests/Tasks.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/microservices/Users/">
+    <Project Path="tests/microservices/Users/Users.API.Tests/Users.API.Tests.csproj" />
+    <Project Path="tests/microservices/Users/Users.Application.Tests/Users.Application.Tests.csproj" />
+    <Project Path="tests/microservices/Users/Users.Architecture.Tests/Users.Architecture.Tests.csproj" />
+    <Project Path="tests/microservices/Users/Users.Domain.Tests/Users.Domain.Tests.csproj" />
+    <Project Path="tests/microservices/Users/Users.Infrastructure.Tests/Users.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
