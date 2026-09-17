@@ -1,6 +1,11 @@
 <Project>
-  <!-- 
-    Centralized targets and properties that apply after project files are evaluated.
-    You can use this to enforce package versions, custom MSBuild tasks, or specific output paths.
+  <!--
+    Automatically restore dotnet local tools (including Husky) and install
+    git hooks after 'dotnet restore'. Runs only in local dev environments.
+    CI environments set HUSKY=0 to skip this entirely.
   -->
+  <Target Name="HuskyInstall" AfterTargets="Restore" Condition="'$(HUSKY)' != '0' AND '$(CI)' == ''">
+    <Exec Command="dotnet tool restore" WorkingDirectory="$(MSBuildThisFileDirectory)" StandardOutputImportance="Low" />
+    <Exec Command="dotnet husky install" WorkingDirectory="$(MSBuildThisFileDirectory)" StandardOutputImportance="Low" />
+  </Target>
 </Project>
