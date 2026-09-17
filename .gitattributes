@@ -1,0 +1,27 @@
+# Default behavior
+* text=auto
+
+# Source code
+*.cs text diff=csharp
+*.sln text eol=crlf
+*.slnx text eol=crlf
+*.csproj text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
+*.xml text eol=crlf
+
+# Scripts
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Web assets
+*.json text
+*.js text
+*.css text
+*.html text
+
+# Documentation
+*.md text
+*.txt text

@@ -1,0 +1,6 @@
+<Project>
+  <!-- 
+    Centralized targets and properties that apply after project files are evaluated.
+    You can use this to enforce package versions, custom MSBuild tasks, or specific output paths.
+  -->
+</Project>
