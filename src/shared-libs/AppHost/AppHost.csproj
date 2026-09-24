@@ -1,0 +1,22 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.5.4">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <UserSecretsId>16b76e93-50ac-4a12-8484-e842c759946e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.5.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\microservices\Notifications\Notifications.API\Notifications.API.csproj" />
+    <ProjectReference Include="..\..\microservices\Tasks\Tasks.API\Tasks.API.csproj" />
+    <ProjectReference Include="..\..\microservices\Users\Users.API\Users.API.csproj" />
+  </ItemGroup>  
+
+</Project>
