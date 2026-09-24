@@ -1,9 +1,11 @@
 using ServiceDefaults.CORS;
+using ServiceDefaults.ErrorHandling;
 using ServiceDefaults.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddErrorHandling();
 
 builder.Logging.ClearProviders();
 builder.Host.AddSerilogLogging();
