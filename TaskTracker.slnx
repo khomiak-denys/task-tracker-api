@@ -22,6 +22,9 @@
     <Project Path="src/microservices/Users/Users.Infrastructure/Users.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/shared-libs/">
+    <Project Path="src/shared-libs/AppHost/AppHost.csproj" Id="e581a804-5b5d-4dee-bd0e-b95314a5be3d" />
+    <Project Path="src/shared-libs/DomainFramework/DomainFramework.csproj" />
+    <Project Path="src/shared-libs/Messaging/Messaging.csproj" />
     <Project Path="src/shared-libs/ServiceDefaults/ServiceDefaults.csproj" Id="6c7bf7a1-8c92-4378-b559-370d8aa25f27" />
   </Folder>
   <Folder Name="/tests/" />
@@ -47,5 +50,4 @@
     <Project Path="tests/microservices/Users/Users.Domain.Tests/Users.Domain.Tests.csproj" />
     <Project Path="tests/microservices/Users/Users.Infrastructure.Tests/Users.Infrastructure.Tests.csproj" />
   </Folder>
-  <Project Path="src/shared-libs/AppHost/AppHost.csproj" Id="e581a804-5b5d-4dee-bd0e-b95314a5be3d" />
 </Solution>
