@@ -1,6 +1,11 @@
+using ServiceDefaults;
+
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.AddServiceDefaults();
+builder.Logging.ClearProviders();
+builder.Host.AddSerilogLogging();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
