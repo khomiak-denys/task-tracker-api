@@ -1,9 +1,12 @@
-﻿using ServiceDefaults.CORS;
+﻿using Serilog;
+using ServiceDefaults.CORS;
 using ServiceDefaults.ErrorHandling;
 using ServiceDefaults.Logging;
 using ServiceDefaults.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Serilog.Debugging.SelfLog.Enable(Console.Error);
 
 builder.AddServiceDefaults();
 builder.AddErrorHandling();
@@ -20,10 +23,15 @@ builder.AddCors(corsOptions);
 builder.AddRateLimiting();
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
