@@ -1,10 +1,18 @@
-using ServiceDefaults;
+using ServiceDefaults.CORS;
+using ServiceDefaults.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
 builder.Logging.ClearProviders();
 builder.Host.AddSerilogLogging();
+
+var corsOptions = builder.Configuration
+    .GetRequiredSection(CorsOptions.SectionName)
+    .Get<CorsOptions>()!;
+
+builder.AddCors(corsOptions);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
