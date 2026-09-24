@@ -1,0 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace ServiceDefaults.CORS
+{
+    public class CorsOptions
+    {
+        public const string SectionName = nameof(CorsOptions);
+
+        [Required]
+        public required string Name { get; init; }
+        [Required]
+        public required string[] AllowedOrigins { get; init; }
+        [Required]
+        public required string[] AllowedMethods { get; init; }
+        [Required]
+        public required string[] AllowedHeaders { get; init; }
+    }
+}
