@@ -2,6 +2,7 @@
 using ServiceDefaults.CORS;
 using ServiceDefaults.ErrorHandling;
 using ServiceDefaults.Logging;
+using ServiceDefaults.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ var corsOptions = builder.Configuration
     .Get<CorsOptions>()!;
 
 builder.AddCors(corsOptions);
+
+builder.AddRateLimiting();
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
@@ -37,7 +40,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();
+
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("public-api");
 
 app.Run();
