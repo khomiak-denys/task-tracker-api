@@ -1,3 +1,4 @@
+﻿using ServiceDefaults.Authentification;
 ﻿using Serilog;
 using ServiceDefaults.CORS;
 using ServiceDefaults.ErrorHandling;
@@ -20,6 +21,9 @@ var corsOptions = builder.Configuration
 
 builder.AddCors(corsOptions);
 
+builder.AddAuthentication();
+builder.Services.AddAuthorization();
+
 builder.AddRateLimiting();
 
 builder.Services.AddControllers();
@@ -40,9 +44,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRateLimiter();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 app.MapControllers().RequireRateLimiting("public-api");
 
 app.Run();
