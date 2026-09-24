@@ -1,3 +1,4 @@
+﻿using ServiceDefaults.Authentification;
 using ServiceDefaults.CORS;
 using ServiceDefaults.ErrorHandling;
 using ServiceDefaults.Logging;
@@ -16,6 +17,10 @@ var corsOptions = builder.Configuration
 
 builder.AddCors(corsOptions);
 
+builder.AddAuthentication();
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,6 +34,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
