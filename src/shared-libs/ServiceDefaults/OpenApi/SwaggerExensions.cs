@@ -22,12 +22,12 @@ namespace ServiceDefaults.OpenApi
                     Description = "Enter your JWT access token",
                 };
 
-                options.AddSecurityDefinition("Bearer", jwtSecurityScheme);
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, jwtSecurityScheme);
                 options.EnableAnnotations();
-                options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecuritySchemeReference("Bearer"),
+                        new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme, document),
                         new List<string>()
                     }
                 });
