@@ -45,7 +45,14 @@ namespace ServiceDefaults.ErrorHandling
                     Detail = error.Message,
                     Type = "https://httpstatuses.io/400"
                 },
-                _ => throw new NotImplementedException()
+                UnauthorizedError => new ProblemDetails
+                {
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = error.Message,
+                    Type = "https://httpstatuses.io/401"
+                },
+                _ => throw new InvalidOperationException($"Unexpected error type: {error.GetType().Name}")
             };
 
         }

@@ -4,66 +4,67 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ServiceDefaults.Telemetry;
 
-namespace Microsoft.Extensions.Hosting;
-
-// Adds common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
-// This project should be referenced by each service project in your solution.
-// To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
-public static class Extensions
+namespace Microsoft.Extensions.Hosting
 {
-    private const string HealthEndpointPath = "/health";
-    private const string AlivenessEndpointPath = "/alive";
-
-    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    // Adds common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
+    // This project should be referenced by each service project in your solution.
+    // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
+    public static class Extensions
     {
-        builder.ConfigureOpenTelemetry();
+        private const string HealthEndpointPath = "/health";
+        private const string AlivenessEndpointPath = "/alive";
 
-        builder.AddDefaultHealthChecks();
-
-        builder.Services.AddServiceDiscovery();
-
-        builder.Services.ConfigureHttpClientDefaults(http =>
+        public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
-            // Turn on resilience by default
-            http.AddStandardResilienceHandler();
+            builder.ConfigureOpenTelemetry();
 
-            // Turn on service discovery by default
-            http.AddServiceDiscovery();
-        });
+            builder.AddDefaultHealthChecks();
 
-        // Uncomment the following to restrict the allowed schemes for service discovery.
-        // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
-        // {
-        //     options.AllowedSchemes = ["https"];
-        // });
+            builder.Services.AddServiceDiscovery();
 
-        return builder;
-    }
-
-    public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-    {
-        builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
-
-        return builder;
-    }
-
-    public static WebApplication MapDefaultEndpoints(this WebApplication app)
-    {
-        // Adding health checks endpoints to applications in non-development environments has security implications.
-        // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
-        if (app.Environment.IsDevelopment())
-        {
-            // All health checks must pass for app to be considered ready to accept traffic after starting
-            app.MapHealthChecks(HealthEndpointPath);
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
+            builder.Services.ConfigureHttpClientDefaults(http =>
             {
-                Predicate = r => r.Tags.Contains("live")
+                // Turn on resilience by default
+                http.AddStandardResilienceHandler();
+
+                // Turn on service discovery by default
+                http.AddServiceDiscovery();
             });
+
+            // Uncomment the following to restrict the allowed schemes for service discovery.
+            // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+            // {
+            //     options.AllowedSchemes = ["https"];
+            // });
+
+            return builder;
         }
 
-        return app;
+        public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+        {
+            builder.Services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+
+            return builder;
+        }
+
+        public static WebApplication MapDefaultEndpoints(this WebApplication app)
+        {
+            // Adding health checks endpoints to applications in non-development environments has security implications.
+            // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
+            if (app.Environment.IsDevelopment())
+            {
+                // All health checks must pass for app to be considered ready to accept traffic after starting
+                app.MapHealthChecks(HealthEndpointPath);
+
+                // Only health checks tagged with the "live" tag must pass for app to be considered alive
+                app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
+                {
+                    Predicate = r => r.Tags.Contains("live")
+                });
+            }
+
+            return app;
+        }
     }
 }
