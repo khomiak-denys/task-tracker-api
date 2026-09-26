@@ -2,14 +2,14 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceDefaults.ErrorHandling;
-using Users.API.Contracts;
+using Users.API.Users.Requests;
 using Users.Application.Users.ChangePassword;
 using Users.Application.Users.Delete;
 using Users.Application.Users.GetAll;
 using Users.Application.Users.GetProfile;
 using Users.Application.Users.UpdateProfile;
 
-namespace Users.API.Controllers
+namespace Users.API.Users
 {
     [Route("api/v1/users")]
     [ApiController]
@@ -44,8 +44,7 @@ namespace Users.API.Controllers
         [HttpPut("{id:guid}/profile")]
         public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UpdateProfileRequest request, CancellationToken ct)
         {
-            var command = new UpdateProfileCommand(id, request.FullName, request.UserName);
-            var result = await _sender.Send(command, ct);
+            var result = await _sender.Send(request.ToCommand(id), ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));
         }
@@ -53,8 +52,7 @@ namespace Users.API.Controllers
         [HttpPut("{id:guid}/password")]
         public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordRequest request, CancellationToken ct)
         {
-            var command = new ChangePasswordCommand(id, request.CurrentPassword, request.NewPassword);
-            var result = await _sender.Send(command, ct);
+            var result = await _sender.Send(request.ToCommand(id), ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));
         }

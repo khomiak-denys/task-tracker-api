@@ -2,13 +2,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceDefaults.ErrorHandling;
-using Users.API.Contracts;
+using Users.API.Auth.Requests;
 using Users.Application.Auth.Login;
 using Users.Application.Auth.RefreshToken;
 using Users.Application.Auth.Register;
 using Users.Application.Auth.RevokeRefreshToken;
 
-namespace Users.API.Controllers
+namespace Users.API.Auth
 {
     [Route("api/v1/auth")]
     [ApiController]
@@ -25,8 +25,7 @@ namespace Users.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
         {
-            var command = new RegisterCommand(request.Email, request.UserName, request.Password);
-            var result = await _sender.Send(command, ct);
+            var result = await _sender.Send(request.ToCommand(), ct);
 
             if (result.IsSuccess)
             {
@@ -41,8 +40,7 @@ namespace Users.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
-            var command = new LoginCommand(request.Email, request.Password);
-            var result = await _sender.Send(command, ct);
+            var result = await _sender.Send(request.ToCommand(), ct);
 
             if (result.IsSuccess)
             {

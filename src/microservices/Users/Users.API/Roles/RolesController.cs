@@ -8,7 +8,7 @@ using Users.Application.Roles.GetAll;
 using Users.Application.Roles.GetForUser;
 using Users.Application.Roles.Remove;
 
-namespace Users.API.Controllers
+namespace Users.API.Roles
 {
     [Route("api/v1/roles")]
     [ApiController]
