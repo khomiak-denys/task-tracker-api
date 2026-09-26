@@ -10,5 +10,10 @@ namespace ServiceDefaults.ErrorHandling
         {
             return resultor.IsSuccess ? result : onFailure(resultor.Error);
         }
+
+        public static IActionResult Match<T>(this Result<T> resultor, IActionResult result, Func<Error, IActionResult> onFailure)
+        {
+            return resultor.IsSuccess ? result : onFailure(resultor.Error);
+        }
     }
 }
