@@ -23,7 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\microservices\Users\Users.API\Users.API.csproj" />
 <ProjectReference Include="..\..\..\..\src\microservices\Users\Users.Application\Users.Application.csproj" />
-<ProjectReference Include="..\..\..\..\src\microservices\Users\Users.Domain\Users.Domain.csproj" />
 <ProjectReference Include="..\..\..\..\src\microservices\Users\Users.Infrastructure\Users.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

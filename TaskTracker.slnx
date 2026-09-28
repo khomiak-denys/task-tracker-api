@@ -47,7 +47,6 @@
     <Project Path="tests/microservices/Users/Users.API.Tests/Users.API.Tests.csproj" />
     <Project Path="tests/microservices/Users/Users.Application.Tests/Users.Application.Tests.csproj" />
     <Project Path="tests/microservices/Users/Users.Architecture.Tests/Users.Architecture.Tests.csproj" />
-    <Project Path="tests/microservices/Users/Users.Domain.Tests/Users.Domain.Tests.csproj" />
     <Project Path="tests/microservices/Users/Users.Infrastructure.Tests/Users.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>
