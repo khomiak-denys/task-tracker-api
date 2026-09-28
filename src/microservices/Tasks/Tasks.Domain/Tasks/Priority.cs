@@ -1,0 +1,13 @@
+using System.Text.Json.Serialization;
+
+namespace Tasks.Domain.Tasks
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum Priority
+    {
+        Low = 0,
+        Medium = 1,
+        High = 2,
+        Critical = 3
+    }
+}
