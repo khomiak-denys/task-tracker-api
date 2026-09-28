@@ -6,7 +6,7 @@ var usersDb = builder.AddPostgres("users-db")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Session)
     .WithPgAdmin()
-    .AddDatabase("users-database");
+    .AddDatabase("UsersDb");
 
 var tasksDb = builder.AddPostgres("tasks-db")
     .WithDataVolume()
