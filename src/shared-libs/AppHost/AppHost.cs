@@ -12,7 +12,7 @@ var tasksDb = builder.AddPostgres("tasks-db")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Session)
     .WithPgAdmin()
-    .AddDatabase("tasks-database");
+    .AddDatabase("TasksDb");
 
 builder.AddProject<Projects.Users_API>("users-api")
     .WithReference(usersDb)
