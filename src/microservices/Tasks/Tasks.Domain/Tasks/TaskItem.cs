@@ -64,6 +64,12 @@ namespace Tasks.Domain.Tasks
             OnModify();
         }
 
+        public void Assign(Guid assigneeId)
+        {
+            AssigneeId = assigneeId;
+            OnModify();
+        }
+
         public void ChangeStatus(TaskStatus newStatus)
         {
             var allowed = Status switch
