@@ -31,7 +31,7 @@ namespace Users.API.Roles
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
         }
 
-        [HttpPost("/api/users/{userId:guid}/roles/{role}")]
+        [HttpPost("/api/v1/users/{userId:guid}/roles/{role}")]
         public async Task<IActionResult> Assign(Guid userId, AppRole role, CancellationToken ct)
         {
             var command = new AssignCommand(userId, role);
@@ -40,7 +40,7 @@ namespace Users.API.Roles
             return result.Match(NoContent(), error => this.ToActionResult(error));
         }
 
-        [HttpDelete("/api/users/{userId:guid}/roles/{role}")]
+        [HttpDelete("/api/v1/users/{userId:guid}/roles/{role}")]
         public async Task<IActionResult> Remove(Guid userId, AppRole role, CancellationToken ct)
         {
             var command = new RemoveCommand(userId, role);
@@ -49,7 +49,7 @@ namespace Users.API.Roles
             return result.Match(NoContent(), error => this.ToActionResult(error));
         }
 
-        [HttpGet("/api/users/{userId:guid}/roles")]
+        [HttpGet("/api/v1/users/{userId:guid}/roles")]
         public async Task<IActionResult> GetForUser(Guid userId, CancellationToken ct)
         {
             var query = new GetForUserQuery(userId);
