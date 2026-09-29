@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -25,7 +26,8 @@ namespace ServiceDefaults.Telemetry
                 {
                     metrics.AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
-                        .AddRuntimeInstrumentation();
+                        .AddRuntimeInstrumentation()
+                        .AddMeter("Npgsql");
                 })
                 .WithTracing(tracing =>
                 {
@@ -38,7 +40,8 @@ namespace ServiceDefaults.Telemetry
                         )
                         // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
                         //.AddGrpcClientInstrumentation()
-                        .AddHttpClientInstrumentation();
+                        .AddHttpClientInstrumentation()
+                        .AddNpgsql();
                 })
                 .WithLogging();
 
