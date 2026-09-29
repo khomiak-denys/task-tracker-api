@@ -29,7 +29,11 @@ namespace Tasks.Application.Tasks.ChangeStatus
                 return Result.Failure(new NotFoundError($"Task '{command.TaskId}' was not found."));
             }
 
-            task.ChangeStatus(command.NewStatus);
+            var result = task.ChangeStatus(command.NewStatus);
+            if (result.IsFailure)
+            {
+                return result;
+            }
 
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();

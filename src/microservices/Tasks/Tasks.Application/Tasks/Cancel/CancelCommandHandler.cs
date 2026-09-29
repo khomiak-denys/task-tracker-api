@@ -29,7 +29,11 @@ namespace Tasks.Application.Tasks.Cancel
                 return Result.Failure(new NotFoundError($"Task '{command.TaskId}' was not found."));
             }
 
-            task.Cancel();
+            var result = task.Cancel();
+            if (result.IsFailure)
+            {
+                return result;
+            }
 
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();

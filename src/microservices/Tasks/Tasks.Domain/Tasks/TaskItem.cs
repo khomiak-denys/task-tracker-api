@@ -1,4 +1,6 @@
 using DomainFramework;
+using DomainFramework.Errors;
+using DomainFramework.Results;
 using TaskStatus = Tasks.Domain.Tasks.TaskStatus;
 
 namespace Tasks.Domain.Tasks
@@ -70,7 +72,7 @@ namespace Tasks.Domain.Tasks
             OnModify();
         }
 
-        public void ChangeStatus(TaskStatus newStatus)
+        public Result ChangeStatus(TaskStatus newStatus)
         {
             var allowed = Status switch
             {
@@ -82,11 +84,12 @@ namespace Tasks.Domain.Tasks
 
             if (!allowed)
             {
-                throw new InvalidOperationException($"Cannot transition task from '{Status}' to '{newStatus}'.");
+                return Result.Failure(new InvalidArgumentError($"Cannot transition task from '{Status}' to '{newStatus}'."));
             }
 
             Status = newStatus;
             OnModify();
+            return Result.Success();
         }
 
         public void LogTime(Guid userId, int minutesSpent, string? description, DateOnly loggedDate)
@@ -96,31 +99,33 @@ namespace Tasks.Domain.Tasks
             OnModify();
         }
 
-        public void Complete()
+        public Result Complete()
         {
             if (Status != TaskStatus.InReview)
             {
-                throw new InvalidOperationException($"Task can only be completed from 'InReview' status. Current status: '{Status}'.");
+                return Result.Failure(new InvalidArgumentError($"Task can only be completed from 'InReview' status. Current status: '{Status}'."));
             }
 
             Status = TaskStatus.Done;
             OnModify();
+            return Result.Success();
         }
 
-        public void Cancel()
+        public Result Cancel()
         {
             if (Status == TaskStatus.Done)
             {
-                throw new InvalidOperationException("A completed task cannot be cancelled.");
+                return Result.Failure(new InvalidArgumentError("A completed task cannot be cancelled."));
             }
 
             if (Status == TaskStatus.Cancelled)
             {
-                throw new InvalidOperationException("Task is already cancelled.");
+                return Result.Failure(new InvalidArgumentError("Task is already cancelled."));
             }
 
             Status = TaskStatus.Cancelled;
             OnModify();
+            return Result.Success();
         }
     }
 }
