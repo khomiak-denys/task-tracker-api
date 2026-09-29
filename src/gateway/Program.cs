@@ -3,7 +3,6 @@ using ServiceDefaults.Authentification;
 using ServiceDefaults.CORS;
 using ServiceDefaults.ErrorHandling;
 using ServiceDefaults.Logging;
-using ServiceDefaults.OpenApi;
 using ServiceDefaults.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,9 +29,6 @@ builder.AddRateLimiting();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.AddSwagger();
-
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetRequiredSection("ReverseProxy"));
 
@@ -40,12 +36,6 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.UseSerilogRequestLogging();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 

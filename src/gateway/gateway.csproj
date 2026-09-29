@@ -6,7 +6,6 @@
     <UserSecretsId>75123fd0-39da-40fa-a548-3134d32d0ccd</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="*" />
     <PackageReference Include="Yarp.ReverseProxy" Version="*" />
   </ItemGroup>
   <ItemGroup>
