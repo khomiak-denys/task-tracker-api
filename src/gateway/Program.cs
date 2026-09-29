@@ -1,25 +1,50 @@
+using Serilog;
+using ServiceDefaults.Authentification;
+using ServiceDefaults.CORS;
+using ServiceDefaults.ErrorHandling;
+using ServiceDefaults.Logging;
+using ServiceDefaults.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+Serilog.Debugging.SelfLog.Enable(Console.Error);
 
-// Uncomment to configure YARP
-// builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+builder.Logging.ClearProviders();
+builder.Host.AddSerilogLogging();
+
+builder.AddServiceDefaults();
+builder.AddErrorHandling();
+
+var corsOptions = builder.Configuration
+    .GetRequiredSection(CorsOptions.SectionName)
+    .Get<CorsOptions>()!;
+
+builder.AddCors(corsOptions);
+
+builder.AddAuthentication();
+builder.Services.AddAuthorization();
+
+builder.AddRateLimiting();
+
+builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetRequiredSection("ReverseProxy"));
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseExceptionHandler();
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
 
-// Uncomment to map YARP
-// app.MapReverseProxy();
+app.MapReverseProxy();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseRateLimiter();
+app.MapControllers().RequireRateLimiting("public-api");
 
 app.Run();

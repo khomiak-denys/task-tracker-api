@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\gateway\gateway.csproj" />
     <ProjectReference Include="..\..\microservices\Notifications\Notifications.API\Notifications.API.csproj" />
     <ProjectReference Include="..\..\microservices\Tasks\Tasks.API\Tasks.API.csproj" />
     <ProjectReference Include="..\..\microservices\Users\Users.API\Users.API.csproj" />

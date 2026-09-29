@@ -3,10 +3,13 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>75123fd0-39da-40fa-a548-3134d32d0ccd</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="*" />
-    <!-- Uncomment to use YARP for the API Gateway -->
-    <!-- <PackageReference Include="Yarp.ReverseProxy" Version="*" /> -->
+    <PackageReference Include="Yarp.ReverseProxy" Version="*" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\shared-libs\ServiceDefaults\ServiceDefaults.csproj" />
+  </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://www.schemastore.org/aspire-8.0.json" /></VisualStudio></ProjectExtensions>
 </Project>
