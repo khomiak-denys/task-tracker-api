@@ -14,12 +14,18 @@ var tasksDb = builder.AddPostgres("tasks-db")
     .WithPgAdmin()
     .AddDatabase("TasksDb");
 
-builder.AddProject<Projects.Users_API>("users-api")
+var usersApi = builder.AddProject<Projects.Users_API>("users-api")
     .WithReference(usersDb)
     .WaitFor(usersDb);
 
-builder.AddProject<Projects.Tasks_API>("tasks-api")
+var tasksApi = builder.AddProject<Projects.Tasks_API>("tasks-api")
     .WithReference(tasksDb)
     .WaitFor(tasksDb);
+
+var gateway = builder.AddProject<Projects.gateway>("gateway")
+    .WithReference(usersApi)
+    .WithReference(tasksApi)
+    .WaitFor(tasksApi)
+    .WaitFor(usersApi);
 
 await builder.Build().RunAsync();
