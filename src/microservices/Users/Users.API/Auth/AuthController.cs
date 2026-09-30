@@ -15,6 +15,13 @@ namespace Users.API.Auth
     public class AuthController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly CookieOptions _cookieOptions = new()
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
 
         public AuthController(ISender sender)
         {
@@ -106,25 +113,12 @@ namespace Users.API.Auth
 
         private void AppendRefreshTokenCookie(string refreshToken)
         {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(7)
-            };
-            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            Response.Cookies.Append("refreshToken", refreshToken, _cookieOptions);
         }
 
         private void ClearRefreshTokenCookie()
         {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None
-            };
-            Response.Cookies.Delete("refreshToken", cookieOptions);
+            Response.Cookies.Delete("refreshToken", _cookieOptions);
         }
     }
 }
