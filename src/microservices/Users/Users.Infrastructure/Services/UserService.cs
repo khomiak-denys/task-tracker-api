@@ -31,7 +31,17 @@ namespace Users.Infrastructure.Services
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var dto = new UserProfileResult(user.Id, user.Email!, user.UserName!, user.FullName, roles.ToList());
+            var dto = new UserProfileResult(
+                user.Id,
+                user.Email!,
+                user.UserName!,
+                user.FullName,
+                user.EmailConfirmed,
+                user.TwoFactorEnabled,
+                user.LockoutEnd,
+                user.LockoutEnabled,
+                user.AccessFailedCount,
+                roles.ToList());
             return Result<UserProfileResult>.Success(dto);
         }
 
@@ -60,11 +70,11 @@ namespace Users.Infrastructure.Services
 
             if (userName != null)
             {
-                user.UserName = userName;
+                user.UserName = userName.Trim();
             }
             if (fullName != null)
             {
-                user.FullName = fullName;
+                user.FullName = string.IsNullOrWhiteSpace(fullName) ? null : fullName.Trim();
             }
 
             var result = await _userManager.UpdateAsync(user);

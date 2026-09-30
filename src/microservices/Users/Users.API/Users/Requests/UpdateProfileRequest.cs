@@ -6,7 +6,10 @@ namespace Users.API.Users.Requests
     {
         public UpdateProfileCommand ToCommand(Guid userId)
         {
-            return new UpdateProfileCommand(userId, FullName, UserName);
+            return new UpdateProfileCommand(
+                userId,
+                string.IsNullOrWhiteSpace(FullName) ? null : FullName.Trim(),
+                string.IsNullOrWhiteSpace(UserName) ? null : UserName.Trim());
         }
     }
 }
