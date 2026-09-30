@@ -39,6 +39,8 @@ app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
+app.UseCors(corsOptions.Name);
+
 app.MapReverseProxy();
 
 app.UseAuthentication();
