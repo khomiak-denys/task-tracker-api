@@ -110,7 +110,7 @@ namespace Users.API.Auth
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
@@ -118,7 +118,13 @@ namespace Users.API.Auth
 
         private void ClearRefreshTokenCookie()
         {
-            Response.Cookies.Delete("refreshToken");
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            };
+            Response.Cookies.Delete("refreshToken", cookieOptions);
         }
     }
 }
