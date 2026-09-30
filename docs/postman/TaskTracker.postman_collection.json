@@ -1,0 +1,959 @@
+{
+  "info": {
+    "_postman_id": "c921509a-6b21-4d37-9759-4d642398418b",
+    "name": "Task Tracker API",
+    "description": "Postman Collection for Task Tracker API microservices (Users API, Roles, Auth, and Tasks API).\n\nIncludes authentication flows, token handling script, environment/collection variables, and requests for all endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7001",
+      "type": "string"
+    },
+    {
+      "key": "usersBaseUrl",
+      "value": "https://localhost:7001",
+      "type": "string"
+    },
+    {
+      "key": "tasksBaseUrl",
+      "value": "https://localhost:7002",
+      "type": "string"
+    },
+    {
+      "key": "gatewayBaseUrl",
+      "value": "https://localhost:6001",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "type": "string"
+    },
+    {
+      "key": "taskId",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "type": "string"
+    },
+    {
+      "key": "role",
+      "value": "User",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Auth",
+      "description": "Authentication endpoints for user registration, login, token refresh, and token revocation.",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "if (!json.token && json.accessToken) {",
+                  "    json.token = json.accessToken;",
+                  "}",
+                  "",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set(\"access_token\", json.token);",
+                  "    console.log(\"Token saved:\", json.token);",
+                  "} else {",
+                  "    console.error(\"Token NOT FOUND in response\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"userName\": \"johndoe\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Registers a new user and returns an access token, setting the refresh token in an HTTP-only cookie."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "if (!json.token && json.accessToken) {",
+                  "    json.token = json.accessToken;",
+                  "}",
+                  "",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set(\"access_token\", json.token);",
+                  "    console.log(\"Token saved:\", json.token);",
+                  "} else {",
+                  "    console.error(\"Token NOT FOUND in response\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates a user and saves the access token to collection variables via test script."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "if (!json.token && json.accessToken) {",
+                  "    json.token = json.accessToken;",
+                  "}",
+                  "",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set(\"access_token\", json.token);",
+                  "    console.log(\"Token saved:\", json.token);",
+                  "} else {",
+                  "    console.error(\"Token NOT FOUND in response\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Refreshes an expired access token using the refreshToken HTTP-only cookie and the previous access token."
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/auth/revoke",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "revoke"
+              ]
+            },
+            "description": "Revokes the active refresh token for the authenticated user and clears the cookie."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02. Users",
+      "description": "Endpoints for retrieving, updating, and managing user profiles.",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users?page=1&pageSize=10",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default 1)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "Page size (default 10)"
+                }
+              ]
+            },
+            "description": "Returns a paginated list of all users."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const user = pm.response.json();",
+                  "    if (user && user.id) {",
+                  "        pm.collectionVariables.set(\"userId\", user.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:id",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Retrieves the profile of a specific user by their ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"userName\": \"johndoe_updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:id/profile",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":id",
+                "profile"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Updates full name and user name for the specified user."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:id/password",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":id",
+                "password"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Changes the password for the specified user."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:id",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Deletes the user account by ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03. Roles",
+      "description": "Role management endpoints (Admin only). Allows viewing roles, assigning roles, and removing roles from users.",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/roles",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "roles"
+              ]
+            },
+            "description": "Lists all available application roles (Admin, Manager, User)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Roles For User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:userId/roles",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":userId",
+                "roles"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Gets all roles assigned to the specified user."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Role to User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:userId/roles/:role",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":userId",
+                "roles",
+                ":role"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                },
+                {
+                  "key": "role",
+                  "value": "{{role}}",
+                  "description": "Role to assign (Admin | Manager | User)"
+                }
+              ]
+            },
+            "description": "Assigns a role to the specified user (Admin role required)."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Role from User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/:userId/roles/:role",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":userId",
+                "roles",
+                ":role"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "User identifier (GUID)"
+                },
+                {
+                  "key": "role",
+                  "value": "{{role}}",
+                  "description": "Role to remove (Admin | Manager | User)"
+                }
+              ]
+            },
+            "description": "Removes a role from the specified user (Admin role required)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04. Tasks",
+      "description": "Task management endpoints (Tasks microservice). Supports CRUD operations, assignment, status transitions, and time logging.",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks?page=1&pageSize=10",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page index (1-based)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Retrieves a paginated list of all tasks."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/my?type=assigned&page=1&pageSize=10",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "assigned",
+                  "description": "Task filter type (e.g. 'assigned' or 'created')"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page index"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "Page size"
+                }
+              ]
+            },
+            "description": "Gets tasks related to the authenticated user (created or assigned)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Retrieves complete task details by ID (must be creator, assignee, or admin)."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    try {",
+                  "        const body = pm.response.text();",
+                  "        const taskId = body.replace(/\"/g, '').trim();",
+                  "        if (taskId) {",
+                  "            pm.collectionVariables.set(\"taskId\", taskId);",
+                  "            console.log(\"New taskId saved:\", taskId);",
+                  "        }",
+                  "    } catch (e) {",
+                  "        console.error(\"Could not parse created taskId\", e);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implement User Authentication Flow\",\n  \"description\": \"Configure JWT tokens, refresh tokens, and authentication cookies\",\n  \"priority\": \"High\",\n  \"deadline\": \"2026-10-15T18:00:00.000Z\",\n  \"assigneeId\": \"{{userId}}\",\n  \"tags\": [\n    \"backend\",\n    \"auth\",\n    \"security\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "description": "Creates a new task. Priority values: Low, Medium, High, Critical."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implement User Authentication Flow (Updated)\",\n  \"description\": \"Added rate limiting and CORS policy configuration\",\n  \"priority\": \"Critical\",\n  \"deadline\": \"2026-10-20T18:00:00.000Z\",\n  \"tags\": [\n    \"backend\",\n    \"auth\",\n    \"security\",\n    \"gateway\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Updates metadata, title, description, priority, deadline, or tags of an existing task."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Task",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id/assign/:userId",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id",
+                "assign",
+                ":userId"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "Target assignee user identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Assigns the specified task to a designated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Task Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"InProgress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id/status",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Changes the task status. Allowed values: Todo, InProgress, InReview, Done, Cancelled."
+          },
+          "response": []
+        },
+        {
+          "name": "Log Time",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"minutesSpent\": 90,\n  \"description\": \"Implemented JWT bearer handling in gateway and tested routes\",\n  \"loggedDate\": \"2026-09-28\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id/time-logs",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id",
+                "time-logs"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Logs work duration and notes against a task."
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Task",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id/complete",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id",
+                "complete"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Marks a task as completed."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/:id",
+              "host": [
+                "{{tasksBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{taskId}}",
+                  "description": "Task identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Cancels a task by ID."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
