@@ -14,4 +14,7 @@
     <ProjectReference Include="..\..\..\shared-libs\DomainFramework\DomainFramework.csproj" />
     <ProjectReference Include="..\..\..\shared-libs\Messaging\Messaging.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tasks.Application.Tests" />
+  </ItemGroup>
 </Project>

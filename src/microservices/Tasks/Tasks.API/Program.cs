@@ -3,6 +3,7 @@ using Messaging.PipelineBehaviors;
 using MigrationsExtensions;
 using Serilog;
 using ServiceDefaults.Authentification;
+using ServiceDefaults.Authorization;
 using ServiceDefaults.CORS;
 using ServiceDefaults.ErrorHandling;
 using ServiceDefaults.Logging;
@@ -29,7 +30,7 @@ var corsOptions = builder.Configuration
 builder.AddCors(corsOptions);
 
 builder.AddAuthentication();
-builder.Services.AddAuthorization();
+builder.AddAuthorization();
 
 builder.AddRateLimiting();
 
