@@ -30,8 +30,8 @@ namespace Tasks.Application.Tasks.Assign
                 return Result.Failure(new NotFoundError($"Task '{command.TaskId}' was not found."));
             }
 
-            var userExists = await _usersApiClient.ExistsAsync(command.AssigneeId, cancellationToken);
-            if (!userExists)
+            var user = await _usersApiClient.GetByIdAsync(command.AssigneeId, cancellationToken);
+            if (user is null)
             {
                 return Result.Failure(new NotFoundError($"User '{command.AssigneeId}' was not found."));
             }

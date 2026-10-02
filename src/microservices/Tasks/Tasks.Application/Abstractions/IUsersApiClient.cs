@@ -1,3 +1,5 @@
+using Tasks.Application.Tasks.DTOs;
+
 namespace Tasks.Application.Abstractions
 {
     /// <summary>
@@ -6,11 +8,11 @@ namespace Tasks.Application.Abstractions
     public interface IUsersApiClient
     {
         /// <summary>
-        /// Checks if a user with the specified identifier exists by calling the Users API.
+        /// Retrieves user details by identifier from the Users API.
         /// </summary>
         /// <param name="userId">The unique identifier of the user.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns><c>true</c> if the user exists; otherwise, <c>false</c>.</returns>
-        Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken);
+        /// <returns>The user details if found; otherwise, <c>null</c>.</returns>
+        Task<UserResult?> GetByIdAsync(Guid userId, CancellationToken cancellationToken);
     }
 }
