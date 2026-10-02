@@ -11,6 +11,7 @@ using Users.Application;
 using Users.Infrastructure;
 using Users.Infrastructure.Persistence;
 using ServiceDefaults.OpenApi;
+using ServiceDefaults.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +30,8 @@ var corsOptions = builder.Configuration
 builder.AddCors(corsOptions);
 
 builder.AddAuthentication();
+builder.AddAuthorization();
 
-builder.Services.AddAuthorization();
 builder.AddRateLimiting();
 
 builder.Services.AddApplication();
