@@ -26,7 +26,7 @@ namespace Tasks.Infrastructure.Clients
         /// <inheritdoc />
         public async Task<UserResult?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v1/private-integrations/users/{userId}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v1/private-integrations/users/{userId}/contact-info");
 
             if (!string.IsNullOrWhiteSpace(_apiKeyOptions.Value.ApiKey))
             {

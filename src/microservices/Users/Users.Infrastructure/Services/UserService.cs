@@ -45,6 +45,23 @@ namespace Users.Infrastructure.Services
             return Result<UserProfileResult>.Success(dto);
         }
 
+        public async Task<Result<UserContactInfoResult>> GetContactInfoByIdAsync(Guid userId, CancellationToken ct)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return Result<UserContactInfoResult>.Failure(new NotFoundError("User not found"));
+            }
+
+            var dto = new UserContactInfoResult(
+                user.Id,
+                user.Email!,
+                user.UserName!,
+                user.FullName);
+
+            return Result<UserContactInfoResult>.Success(dto);
+        }
+
         public async Task<Result<PaginationResult<UserResult>>> GetAllAsync(int page, int pageSize, CancellationToken ct)
         {
             var query = _dbContext.Users.AsNoTracking();
