@@ -35,7 +35,7 @@ namespace Tasks.API.Tasks
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
-            var query = new GetAllQuery(page, pageSize);
+            var query = new GetAllTasksQuery(page, pageSize);
             var result = await _mediator.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
@@ -54,7 +54,7 @@ namespace Tasks.API.Tasks
                 return Unauthorized();
             }
 
-            var query = new GetMyQuery(userId, type, page, pageSize);
+            var query = new GetMyTasksQuery(userId, type, page, pageSize);
             var result = await _mediator.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
@@ -75,7 +75,7 @@ namespace Tasks.API.Tasks
             }
 
             var isAdmin = User.IsInRole("Admin");
-            var query = new GetByIdQuery(id, userId, isAdmin);
+            var query = new GetTaskByIdQuery(id, userId, isAdmin);
             var result = await _mediator.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
@@ -134,7 +134,7 @@ namespace Tasks.API.Tasks
                 return Unauthorized();
             }
 
-            var command = new AssignCommand(id, userId, currentUserId);
+            var command = new AssignTaskCommand(id, userId, currentUserId);
             var result = await _mediator.Send(command, ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));
@@ -146,7 +146,7 @@ namespace Tasks.API.Tasks
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] ChangeStatusRequest request, CancellationToken ct)
+        public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] ChangeTaskStatusRequest request, CancellationToken ct)
         {
             var userId = GetUserId();
             if (userId == Guid.Empty)
@@ -166,7 +166,7 @@ namespace Tasks.API.Tasks
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> LogTime(Guid id, [FromBody] LogTimeRequest request, CancellationToken ct)
+        public async Task<IActionResult> LogTime(Guid id, [FromBody] LogTaskTimeRequest request, CancellationToken ct)
         {
             var userId = GetUserId();
             if (userId == Guid.Empty)
@@ -194,7 +194,7 @@ namespace Tasks.API.Tasks
                 return Unauthorized();
             }
 
-            var command = new CompleteCommand(id, userId);
+            var command = new CompleteTaskCommand(id, userId);
             var result = await _mediator.Send(command, ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));
@@ -214,7 +214,7 @@ namespace Tasks.API.Tasks
                 return Unauthorized();
             }
 
-            var command = new CancelCommand(id, userId);
+            var command = new CancelTaskCommand(id, userId);
             var result = await _mediator.Send(command, ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));

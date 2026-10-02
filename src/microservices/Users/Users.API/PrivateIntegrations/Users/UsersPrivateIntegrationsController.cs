@@ -42,7 +42,7 @@ namespace Users.API.PrivateIntegrations.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserById(Guid id, CancellationToken ct = default)
         {
-            var query = new GetProfileQuery(id);
+            var query = new GetUserProfileQuery(id);
             var result = await _sender.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));

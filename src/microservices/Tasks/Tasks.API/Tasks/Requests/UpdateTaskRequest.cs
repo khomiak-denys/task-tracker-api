@@ -10,9 +10,9 @@ namespace Tasks.API.Tasks.Requests
         DateTime? Deadline,
         IEnumerable<string>? Tags)
     {
-        public UpdateCommand ToCommand(Guid taskId, Guid requestedById)
+        public UpdateTaskCommand ToCommand(Guid taskId, Guid requestedById)
         {
-            return new UpdateCommand(
+            return new UpdateTaskCommand(
                 taskId,
                 requestedById,
                 Title,
