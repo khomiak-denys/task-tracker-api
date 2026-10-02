@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Users.API.Users.Requests;
 using Users.Application.DTOs;
 using Users.Application.Roles;
+using Users.Application.Users.ChangePassword;
 using Users.Application.Users.Delete;
 using Users.Application.Users.GetAll;
 using Users.Application.Users.GetProfile;
@@ -28,7 +29,7 @@ namespace Users.API.Users
         }
 
         [HttpGet("{id:guid}")]
-        [SwaggerOperation(Summary = "Gets user profile by id")]
+        [SwaggerOperation(Summary = "Gets a user profile by ID")]
         [ProducesResponseType(typeof(UserProfileResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
