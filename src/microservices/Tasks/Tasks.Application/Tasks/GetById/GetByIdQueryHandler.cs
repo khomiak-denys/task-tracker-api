@@ -1,6 +1,7 @@
 using DomainFramework.Errors;
 using DomainFramework.Results;
 using Messaging.Abstractions;
+using Tasks.Application.Abstractions;
 using Tasks.Application.Tasks.DTOs;
 using Tasks.Domain.Tasks;
 
@@ -9,10 +10,12 @@ namespace Tasks.Application.Tasks.GetById
     internal sealed class GetByIdQueryHandler : IQueryHandler<GetByIdQuery, Result<TaskDetailsResult>>
     {
         private readonly ITaskRepository _taskRepository;
+        private readonly IUsersApiClient _usersApiClient;
 
-        public GetByIdQueryHandler(ITaskRepository taskRepository)
+        public GetByIdQueryHandler(ITaskRepository taskRepository, IUsersApiClient usersApiClient)
         {
             _taskRepository = taskRepository;
+            _usersApiClient = usersApiClient;
         }
 
         public async Task<Result<TaskDetailsResult>> Handle(GetByIdQuery query, CancellationToken cancellationToken)
@@ -43,6 +46,18 @@ namespace Tasks.Application.Tasks.GetById
                     l.CreatedAt))
                 .ToList();
 
+            var createdUserTask = _usersApiClient.GetByIdAsync(task.CreatedById, cancellationToken);
+            var assignedUserTask = task.AssigneeId.HasValue
+                ? _usersApiClient.GetByIdAsync(task.AssigneeId.Value, cancellationToken)
+                : Task.FromResult<UserResult?>(null);
+
+
+            await Task.WhenAll(createdUserTask, assignedUserTask);
+
+            var createdUser = await createdUserTask
+                ?? new UserResult(task.CreatedById, string.Empty, "Unknown", null);
+            var assignedUser = await assignedUserTask;
+
             var result = new TaskDetailsResult(
                 task.Id,
                 task.Title,
@@ -50,8 +65,8 @@ namespace Tasks.Application.Tasks.GetById
                 task.Status,
                 task.Priority,
                 task.Deadline,
-                task.AssigneeId,
-                task.CreatedById,
+                assignedUser,
+                createdUser,
                 task.CreatedAt,
                 task.UpdatedAt,
                 tags,

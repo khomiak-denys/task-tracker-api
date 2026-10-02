@@ -1,43 +1,52 @@
-using System.Net;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Http;
+using System.Net.Http.Json;
+using Microsoft.Extensions.Options;
+using ServiceDefaults.Authorization.IntegrationApiKey;
 using Tasks.Application.Abstractions;
+using Tasks.Application.Tasks.DTOs;
 
 namespace Tasks.Infrastructure.Clients
 {
+    /// <summary>
+    /// HTTP client implementation for communicating with the Users microservice.
+    /// </summary>
     public class UsersApiClient : IUsersApiClient
     {
+        private const string ApiKeyHeader = "X-API-Key";
         private readonly HttpClient _httpClient;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOptions<IntegrationApiKeyOptions> _apiKeyOptions;
 
-        public UsersApiClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+        public UsersApiClient(
+            HttpClient httpClient,
+            IOptions<IntegrationApiKeyOptions> apiKeyOptions)
         {
             _httpClient = httpClient;
-            _httpContextAccessor = httpContextAccessor;
+            _apiKeyOptions = apiKeyOptions;
         }
 
-        public async Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken)
+        /// <inheritdoc />
+        public async Task<UserResult?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v1/users/{userId}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v1/private-integrations/users/{userId}");
 
-            var authorization = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
-            if (!string.IsNullOrWhiteSpace(authorization) && AuthenticationHeaderValue.TryParse(authorization, out var headerValue))
+            if (!string.IsNullOrWhiteSpace(_apiKeyOptions.Value.ApiKey))
             {
-                request.Headers.Authorization = headerValue;
+                request.Headers.Add(ApiKeyHeader, _apiKeyOptions.Value.ApiKey);
             }
 
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                return true;
+                return null;
             }
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
+            try
             {
-                return false;
+                return await response.Content.ReadFromJsonAsync<UserResult>(cancellationToken);
             }
-
-            return false;
+            catch
+            {
+                return null;
+            }
         }
     }
 }
