@@ -6,7 +6,7 @@ using ServiceDefaults.Authorization;
 using ServiceDefaults.ErrorHandling;
 using Swashbuckle.AspNetCore.Annotations;
 using Users.Application.DTOs;
-using Users.Application.Users.GetProfile;
+using Users.Application.Users.GetContactInfo;
 
 namespace Users.API.PrivateIntegrations.Users
 {
@@ -30,19 +30,19 @@ namespace Users.API.PrivateIntegrations.Users
         }
 
         /// <summary>
-        /// Retrieves user profile details by unique identifier for internal service integrations.
+        /// Retrieves user contact information by unique identifier for internal service integrations.
         /// </summary>
         /// <param name="id">The unique identifier of the user.</param>
         /// <param name="ct">The cancellation token.</param>
-        /// <returns>The user profile if found; otherwise, 404 Not Found.</returns>
-        [HttpGet("{id:guid}")]
-        [SwaggerOperation(Summary = "Gets user profile by id for private integrations")]
-        [ProducesResponseType(typeof(UserProfileResult), StatusCodes.Status200OK)]
+        /// <returns>The user contact info if found; otherwise, 404 Not Found.</returns>
+        [HttpGet("{id:guid}/contact-info")]
+        [SwaggerOperation(Summary = "Gets user contact info by id for private integrations")]
+        [ProducesResponseType(typeof(UserContactInfoResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUserById(Guid id, CancellationToken ct = default)
+        public async Task<IActionResult> GetContactInfo(Guid id, CancellationToken ct = default)
         {
-            var query = new GetUserProfileQuery(id);
+            var query = new GetUserContactInfoQuery(id);
             var result = await _sender.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
