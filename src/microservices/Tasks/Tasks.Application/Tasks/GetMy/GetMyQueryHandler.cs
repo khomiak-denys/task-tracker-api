@@ -33,9 +33,6 @@ namespace Tasks.Application.Tasks.GetMy
                     task.Priority,
                     task.Deadline,
                     task.AssigneeId,
-                    task.CreatedById,
-                    task.CreatedAt,
-                    task.UpdatedAt,
                     task.TaskTags
                         .Where(tt => tt.Tag is not null)
                         .Select(tt => tt.Tag.Name)
