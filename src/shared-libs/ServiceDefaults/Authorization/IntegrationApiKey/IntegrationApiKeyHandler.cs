@@ -23,7 +23,6 @@ namespace ServiceDefaults.Authorization.IntegrationApiKey
             if (_httpContextAccessor.HttpContext!.Request.Headers.TryGetValue(ApiKeyHeader, out var authorizationHeader))
             {
                 var token = authorizationHeader.ToString().Replace(ApiKeyHeader, "", StringComparison.OrdinalIgnoreCase).Trim();
-                LogAuthorizationHeaderValue(_logger, token);
 
                 if (String.Equals(_options.Value.ApiKey, token, StringComparison.OrdinalIgnoreCase))
                 {
@@ -41,10 +40,5 @@ namespace ServiceDefaults.Authorization.IntegrationApiKey
             const string errorMessage = "User is not verified.";
             return $"{nameof(IntegrationApiKeyRequirement)}: {errorMessage}";
         }
-
-        [LoggerMessage(Level = LogLevel.Information, Message = "Authorization header found: {Header}")]
-        public static partial void LogAuthorizationHeaderFound(ILogger logger, string header);
-        [LoggerMessage(Level = LogLevel.Debug, Message = "Authorization header value: {Token}")]
-        public static partial void LogAuthorizationHeaderValue(ILogger logger, string token);
     }
 }
