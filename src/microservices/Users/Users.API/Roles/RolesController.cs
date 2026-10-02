@@ -25,7 +25,7 @@ namespace Users.API.Roles
         [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            var query = new GetAllQuery();
+            var query = new GetAllRolesQuery();
             var result = await _sender.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
@@ -34,7 +34,7 @@ namespace Users.API.Roles
         [HttpPost("/api/v1/users/{userId:guid}/roles/{role}")]
         public async Task<IActionResult> Assign(Guid userId, AppRole role, CancellationToken ct)
         {
-            var command = new AssignCommand(userId, role);
+            var command = new AssignRoleCommand(userId, role);
             var result = await _sender.Send(command, ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));
@@ -43,7 +43,7 @@ namespace Users.API.Roles
         [HttpDelete("/api/v1/users/{userId:guid}/roles/{role}")]
         public async Task<IActionResult> Remove(Guid userId, AppRole role, CancellationToken ct)
         {
-            var command = new RemoveCommand(userId, role);
+            var command = new RemoveRoleCommand(userId, role);
             var result = await _sender.Send(command, ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));
@@ -52,7 +52,7 @@ namespace Users.API.Roles
         [HttpGet("/api/v1/users/{userId:guid}/roles")]
         public async Task<IActionResult> GetForUser(Guid userId, CancellationToken ct)
         {
-            var query = new GetForUserQuery(userId);
+            var query = new GetUserRolesQuery(userId);
             var result = await _sender.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));

@@ -48,7 +48,7 @@ namespace Users.API.Users
                 return Forbid();
             }
 
-            var query = new GetProfileQuery(id);
+            var query = new GetUserProfileQuery(id, currentUserId, isAdmin);
             var result = await _sender.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
@@ -62,7 +62,7 @@ namespace Users.API.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
-            var query = new GetAllQuery(page, pageSize);
+            var query = new GetAllUsersQuery(page, pageSize);
             var result = await _sender.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
@@ -75,7 +75,7 @@ namespace Users.API.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UpdateProfileRequest request, CancellationToken ct)
+        public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UpdateUserProfileRequest request, CancellationToken ct)
         {
             var currentUserId = GetUserId();
             if (currentUserId == Guid.Empty)
@@ -101,7 +101,7 @@ namespace Users.API.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordRequest request, CancellationToken ct)
+        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangeUserPasswordRequest request, CancellationToken ct)
         {
             var currentUserId = GetUserId();
             if (currentUserId == Guid.Empty)
@@ -128,7 +128,7 @@ namespace Users.API.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
-            var command = new DeleteCommand(id);
+            var command = new DeleteUserCommand(id);
             var result = await _sender.Send(command, ct);
 
             return result.Match(NoContent(), error => this.ToActionResult(error));

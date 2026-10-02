@@ -11,9 +11,9 @@ namespace Tasks.API.Tasks.Requests
         Guid? AssigneeId,
         IEnumerable<string>? Tags)
     {
-        public CreateCommand ToCommand(Guid createdById)
+        public CreateTaskCommand ToCommand(Guid createdById)
         {
-            return new CreateCommand(
+            return new CreateTaskCommand(
                 createdById,
                 Title,
                 Description,
