@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Workspaces.Application.Abstractions;
 using Workspaces.Domain.Tags;
 using Workspaces.Domain.Tasks;
+using Workspaces.Domain.Workspaces;
 
 namespace Workspaces.Infrastructure.Persistence
 {
@@ -12,6 +13,9 @@ namespace Workspaces.Infrastructure.Persistence
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<TaskTag> TaskTags => Set<TaskTag>();
         public DbSet<TimeLog> TimeLogs => Set<TimeLog>();
+
+        public DbSet<Workspace> Workspaces => Set<Workspace>();
+        public DbSet<WorkspaceMember> WorkspaceMembers => Set<WorkspaceMember>();
 
         public WorkspacesDbContext(DbContextOptions<WorkspacesDbContext> options) : base(options) { }
 
