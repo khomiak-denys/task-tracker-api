@@ -14,14 +14,14 @@ This directory contains the Postman collection and environment files for testing
 | Service | Protocol / Port (HTTPS) | Protocol / Port (HTTP) | Base Variable |
 | :--- | :--- | :--- | :--- |
 | **Users Microservice** | `https://localhost:7001` | `http://localhost:5001` | `{{usersBaseUrl}}` |
-| **Tasks Microservice** | `https://localhost:7002` | `http://localhost:5002` | `{{tasksBaseUrl}}` |
+| **Workspaces Microservice** | `https://localhost:7002` | `http://localhost:5002` | `{{workspacesBaseUrl}}` / `{{tasksBaseUrl}}` |
 | **API Gateway** | `https://localhost:6001` | `http://localhost:4001` | `{{gatewayBaseUrl}}` |
 
 ---
 
-## Token Extraction Script
+## Token & Variable Extraction Scripts
 
-The authentication requests (`Login`, `Register`, and `Refresh Token`) include the following test script:
+The authentication requests (`Login`, `Register`, and `Refresh Token`) include an automatic token capture test script:
 
 ```javascript
 const json = pm.response.json();
@@ -32,16 +32,21 @@ if (!json.token && json.accessToken) {
 
 if (json.token) {
     pm.collectionVariables.set("access_token", json.token);
+    if (pm.environment && pm.environment.name) {
+        pm.environment.set("access_token", json.token);
+    }
     console.log("Token saved:", json.token);
 } else {
     console.error("Token NOT FOUND in response");
 }
 ```
 
+Similarly, `Create Task` and `Create Workspace` automatically persist `taskId` and `workspaceId` to both collection and active environment scopes upon success (`200 OK`).
+
 ### How It Works:
 1. Upon successful authentication (200 OK), the script parses the JSON response.
 2. It extracts the JWT token from `json.token` (or `json.accessToken`).
-3. It saves the value into the collection variable `access_token`.
+3. It saves the value into both the collection variable and active environment variable `access_token`.
 4. All secured requests in the collection inherit `Bearer {{access_token}}` authentication automatically.
 
 ---
@@ -62,6 +67,7 @@ if (json.token) {
    - **Users**: View user list, inspect profiles, update user information.
    - **Roles**: (Requires user with `Admin` role) View system roles, assign or remove roles.
    - **Tasks**: Create tasks (the new `taskId` is automatically captured), assign tasks, log time, change statuses (`Todo`, `InProgress`, `InReview`, `Done`, `Cancelled`), or cancel tasks.
+   - **Workspaces**: Create workspaces (new `workspaceId` is automatically captured), manage workspace details, list accessible workspaces, and manage workspace members.
 
 ---
 
@@ -97,3 +103,12 @@ if (json.token) {
 - `POST /api/v1/tasks/:id/time-logs` &mdash; Log spent time on a task
 - `POST /api/v1/tasks/:id/complete` &mdash; Mark task as completed
 - `DELETE /api/v1/tasks/:id` &mdash; Cancel a task
+
+### 5. Workspaces (`api/v1/workspaces`)
+- `GET /api/v1/workspaces` &mdash; Get paginated list of workspaces (query: `page`, `pageSize`, `name`)
+- `GET /api/v1/workspaces/:id` &mdash; Get workspace details (Guarded: Owner or Admin)
+- `POST /api/v1/workspaces` &mdash; Create a new workspace (saves `workspaceId` automatically)
+- `PUT /api/v1/workspaces/:id` &mdash; Update workspace name and description (Guarded: Owner or Admin)
+- `DELETE /api/v1/workspaces/:id` &mdash; Delete workspace and associated members (Guarded: Owner or Admin)
+- `POST /api/v1/workspaces/:id/members` &mdash; Add a user as workspace member (Guarded: Owner or Admin)
+- `DELETE /api/v1/workspaces/:id/members/:userId` &mdash; Remove member from workspace (Guarded: Owner, Admin, or self-leaving)

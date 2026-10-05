@@ -9,11 +9,11 @@
     <Project Path="src/microservices/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
     <Project Path="src/microservices/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/microservices/Tasks/">
-    <Project Path="src/microservices/Tasks/Tasks.API/Tasks.API.csproj" />
-    <Project Path="src/microservices/Tasks/Tasks.Application/Tasks.Application.csproj" />
-    <Project Path="src/microservices/Tasks/Tasks.Domain/Tasks.Domain.csproj" />
-    <Project Path="src/microservices/Tasks/Tasks.Infrastructure/Tasks.Infrastructure.csproj" />
+  <Folder Name="/src/microservices/Workspaces/">
+    <Project Path="src/microservices/Workspaces/Workspaces.API/Workspaces.API.csproj" />
+    <Project Path="src/microservices/Workspaces/Workspaces.Application/Workspaces.Application.csproj" />
+    <Project Path="src/microservices/Workspaces/Workspaces.Domain/Workspaces.Domain.csproj" />
+    <Project Path="src/microservices/Workspaces/Workspaces.Infrastructure/Workspaces.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/microservices/Users/">
     <Project Path="src/microservices/Users/Users.API/Users.API.csproj" />
@@ -36,12 +36,12 @@
     <Project Path="tests/microservices/Notifications/Notifications.Domain.Tests/Notifications.Domain.Tests.csproj" />
     <Project Path="tests/microservices/Notifications/Notifications.Infrastructure.Tests/Notifications.Infrastructure.Tests.csproj" />
   </Folder>
-  <Folder Name="/tests/microservices/Tasks/">
-    <Project Path="tests/microservices/Tasks/Tasks.API.Tests/Tasks.API.Tests.csproj" />
-    <Project Path="tests/microservices/Tasks/Tasks.Application.Tests/Tasks.Application.Tests.csproj" />
-    <Project Path="tests/microservices/Tasks/Tasks.Architecture.Tests/Tasks.Architecture.Tests.csproj" />
-    <Project Path="tests/microservices/Tasks/Tasks.Domain.Tests/Tasks.Domain.Tests.csproj" />
-    <Project Path="tests/microservices/Tasks/Tasks.Infrastructure.Tests/Tasks.Infrastructure.Tests.csproj" />
+  <Folder Name="/tests/microservices/Workspaces/">
+    <Project Path="tests/microservices/Workspaces/Workspaces.API.Tests/Workspaces.API.Tests.csproj" />
+    <Project Path="tests/microservices/Workspaces/Workspaces.Application.Tests/Workspaces.Application.Tests.csproj" />
+    <Project Path="tests/microservices/Workspaces/Workspaces.Architecture.Tests/Workspaces.Architecture.Tests.csproj" />
+    <Project Path="tests/microservices/Workspaces/Workspaces.Domain.Tests/Workspaces.Domain.Tests.csproj" />
+    <Project Path="tests/microservices/Workspaces/Workspaces.Infrastructure.Tests/Workspaces.Infrastructure.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/microservices/Users/">
     <Project Path="tests/microservices/Users/Users.API.Tests/Users.API.Tests.csproj" />

@@ -32,6 +32,11 @@
       "type": "string"
     },
     {
+      "key": "workspacesBaseUrl",
+      "value": "https://localhost:7002",
+      "type": "string"
+    },
+    {
       "key": "gatewayBaseUrl",
       "value": "https://localhost:6001",
       "type": "string"
@@ -48,6 +53,16 @@
     },
     {
       "key": "taskId",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "type": "string"
+    },
+    {
+      "key": "workspaceId",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "type": "string"
+    },
+    {
+      "key": "memberUserId",
       "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
       "type": "string"
     },
@@ -77,6 +92,9 @@
                   "",
                   "if (json.token) {",
                   "    pm.collectionVariables.set(\"access_token\", json.token);",
+                  "    if (pm.environment && pm.environment.name) {",
+                  "        pm.environment.set(\"access_token\", json.token);",
+                  "    }",
                   "    console.log(\"Token saved:\", json.token);",
                   "} else {",
                   "    console.error(\"Token NOT FOUND in response\");",
@@ -137,6 +155,9 @@
                   "",
                   "if (json.token) {",
                   "    pm.collectionVariables.set(\"access_token\", json.token);",
+                  "    if (pm.environment && pm.environment.name) {",
+                  "        pm.environment.set(\"access_token\", json.token);",
+                  "    }",
                   "    console.log(\"Token saved:\", json.token);",
                   "} else {",
                   "    console.error(\"Token NOT FOUND in response\");",
@@ -197,6 +218,9 @@
                   "",
                   "if (json.token) {",
                   "    pm.collectionVariables.set(\"access_token\", json.token);",
+                  "    if (pm.environment && pm.environment.name) {",
+                  "        pm.environment.set(\"access_token\", json.token);",
+                  "    }",
                   "    console.log(\"Token saved:\", json.token);",
                   "} else {",
                   "    console.error(\"Token NOT FOUND in response\");",
@@ -301,6 +325,9 @@
                   "    const user = pm.response.json();",
                   "    if (user && user.id) {",
                   "        pm.collectionVariables.set(\"userId\", user.id);",
+                  "        if (pm.environment && pm.environment.name) {",
+                  "            pm.environment.set(\"userId\", user.id);",
+                  "        }",
                   "    }",
                   "}"
                 ],
@@ -687,9 +714,12 @@
                   "if (pm.response.code === 200) {",
                   "    try {",
                   "        const body = pm.response.text();",
-                  "        const taskId = body.replace(/\"/g, '').trim();",
+                  "        const taskId = body.replace(/\"/g, \"\").trim();",
                   "        if (taskId) {",
                   "            pm.collectionVariables.set(\"taskId\", taskId);",
+                  "            if (pm.environment && pm.environment.name) {",
+                  "                pm.environment.set(\"taskId\", taskId);",
+                  "            }",
                   "            console.log(\"New taskId saved:\", taskId);",
                   "        }",
                   "    } catch (e) {",
@@ -950,6 +980,285 @@
               ]
             },
             "description": "Cancels a task by ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05. Workspaces",
+      "description": "Workspace and membership management endpoints (Workspaces microservice). Supports CRUD operations, membership management, and authorization guards.",
+      "item": [
+        {
+          "name": "Get All Workspaces",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces?page=1&pageSize=10",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page index (1-based)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "name",
+                  "value": "",
+                  "description": "Optional workspace name filter",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieves a paginated list of workspaces. Non-admin users receive workspaces they are members of; administrators receive all workspaces."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Workspace By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces/:id",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{workspaceId}}",
+                  "description": "Workspace identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Retrieves detailed workspace information including members list. Guard: Only the workspace owner or an administrator can view details (returns 403 Forbidden otherwise)."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Workspace",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    try {",
+                  "        const body = pm.response.text();",
+                  "        const workspaceId = body.replace(/\"/g, \"\").trim();",
+                  "        if (workspaceId) {",
+                  "            pm.collectionVariables.set(\"workspaceId\", workspaceId);",
+                  "            if (pm.environment && pm.environment.name) {",
+                  "                pm.environment.set(\"workspaceId\", workspaceId);",
+                  "            }",
+                  "            console.log(\"New workspaceId saved:\", workspaceId);",
+                  "        }",
+                  "    } catch (e) {",
+                  "        console.error(\"Could not parse created workspaceId\", e);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering Team\",\n  \"description\": \"Primary workspace for engineering initiatives and task tracking.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces"
+              ]
+            },
+            "description": "Creates a new workspace (Manager role required). The authenticated caller automatically becomes the owner and the first member of the workspace."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Workspace",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering Core\",\n  \"description\": \"Updated description for the engineering workspace.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces/:id",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{workspaceId}}",
+                  "description": "Workspace identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Updates workspace name and description. Guard: Only the workspace owner or an administrator can update the workspace (returns 403 Forbidden otherwise)."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Workspace",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces/:id",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{workspaceId}}",
+                  "description": "Workspace identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Deletes a workspace and its associated members. Guard: Only the workspace owner or an administrator can delete the workspace (returns 403 Forbidden otherwise)."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Workspace Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{memberUserId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces/:id/members",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces",
+                ":id",
+                "members"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{workspaceId}}",
+                  "description": "Workspace identifier (GUID)"
+                }
+              ]
+            },
+            "description": "Adds a user as a member to the workspace. Guard: Only the workspace owner or an administrator can add members. Returns 409 Conflict if user is already a member."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Workspace Member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{workspacesBaseUrl}}/api/v1/workspaces/:id/members/:userId",
+              "host": [
+                "{{workspacesBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "workspaces",
+                ":id",
+                "members",
+                ":userId"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{workspaceId}}",
+                  "description": "Workspace identifier (GUID)"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{memberUserId}}",
+                  "description": "User identifier to remove (GUID)"
+                }
+              ]
+            },
+            "description": "Removes a member from the workspace. Guard: Can be performed by the workspace owner, an administrator, or the member leaving themselves. Cannot remove the workspace owner."
           },
           "response": []
         }

@@ -1,0 +1,56 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Workspaces.Domain.Tasks;
+
+namespace Workspaces.Infrastructure.Persistence.Configurations
+{
+    /// <summary>
+    /// EF Core entity type configuration for <see cref="TaskItem"/>.
+    /// </summary>
+    public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
+    {
+        /// <summary>
+        /// Configures the entity of type <see cref="TaskItem"/>.
+        /// </summary>
+        /// <param name="builder">The builder to be used to configure the entity type.</param>
+        public void Configure(EntityTypeBuilder<TaskItem> builder)
+        {
+            builder.ToTable("Tasks");
+
+            builder.HasKey(t => t.Id);
+
+            builder.Property(t => t.Title)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            builder.Property(t => t.Description)
+                .HasMaxLength(2000);
+
+            builder.Property(t => t.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
+            builder.Property(t => t.Priority)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
+            builder.Property(t => t.AssigneeId);
+            builder.Property(t => t.CreatedById).IsRequired();
+            builder.Property(t => t.Deadline);
+            builder.Property(t => t.CreatedAt).IsRequired();
+            builder.Property(t => t.UpdatedAt);
+
+            builder.HasMany(t => t.TimeLogs)
+                .WithOne(l => l.Task)
+                .HasForeignKey(l => l.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(t => t.TaskTags)
+                .WithOne(tt => tt.Task)
+                .HasForeignKey(tt => tt.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+}

@@ -1,0 +1,234 @@
+using System.Security.Claims;
+using DomainFramework;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using ServiceDefaults.ErrorHandling;
+using Swashbuckle.AspNetCore.Annotations;
+using Workspaces.API.Tasks.Requests;
+using Workspaces.Application.Tasks.Assign;
+using Workspaces.Application.Tasks.Cancel;
+using Workspaces.Application.Tasks.Complete;
+using Workspaces.Application.Tasks.DTOs;
+using Workspaces.Application.Tasks.GetAll;
+using Workspaces.Application.Tasks.GetById;
+using Workspaces.Application.Tasks.GetMy;
+
+namespace Workspaces.API.Tasks
+{
+    [Route("api/v1/tasks")]
+    [ApiController]
+    [Authorize]
+    public class TasksController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public TasksController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        [HttpGet]
+        [SwaggerOperation(Summary = "Gets all tasks with pagination")]
+        [ProducesResponseType(typeof(PaginationResult<TaskResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        {
+            var query = new GetAllTasksQuery(page, pageSize);
+            var result = await _mediator.Send(query, ct);
+
+            return result.Match(Ok(result.Value), error => this.ToActionResult(error));
+        }
+
+        [HttpGet("my")]
+        [SwaggerOperation(Summary = "Gets the current user's tasks with pagination")]
+        [ProducesResponseType(typeof(PaginationResult<TaskResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetMy([FromQuery] string? type = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetMyTasksQuery(userId, type, page, pageSize);
+            var result = await _mediator.Send(query, ct);
+
+            return result.Match(Ok(result.Value), error => this.ToActionResult(error));
+        }
+
+        [HttpGet("{id:guid}")]
+        [SwaggerOperation(Summary = "Gets a task by id")]
+        [ProducesResponseType(typeof(TaskDetailsResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var isAdmin = User.IsInRole("Admin");
+            var query = new GetTaskByIdQuery(id, userId, isAdmin);
+            var result = await _mediator.Send(query, ct);
+
+            return result.Match(Ok(result.Value), error => this.ToActionResult(error));
+        }
+
+        [HttpPost]
+        [SwaggerOperation(Summary = "Creates a new task")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Create([FromBody] CreateTaskRequest request, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = request.ToCommand(userId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(Ok(result.Value), error => this.ToActionResult(error));
+        }
+
+        [HttpPut("{id:guid}")]
+        [SwaggerOperation(Summary = "Updates an existing task")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTaskRequest request, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = request.ToCommand(id, userId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(NoContent(), error => this.ToActionResult(error));
+        }
+
+        [HttpPut("{id:guid}/assign/{userId:guid}")]
+        [SwaggerOperation(Summary = "Assigns a task to a user")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Assign(Guid id, Guid userId, CancellationToken ct)
+        {
+            var currentUserId = GetUserId();
+            if (currentUserId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new AssignTaskCommand(id, userId, currentUserId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(NoContent(), error => this.ToActionResult(error));
+        }
+
+        [HttpPatch("{id:guid}/status")]
+        [SwaggerOperation(Summary = "Changes the status of a task")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] ChangeTaskStatusRequest request, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = request.ToCommand(id, userId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(NoContent(), error => this.ToActionResult(error));
+        }
+
+        [HttpPost("{id:guid}/time-logs")]
+        [SwaggerOperation(Summary = "Logs spent time on a task")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> LogTime(Guid id, [FromBody] LogTaskTimeRequest request, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = request.ToCommand(id, userId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(NoContent(), error => this.ToActionResult(error));
+        }
+
+        [HttpPost("{id:guid}/complete")]
+        [SwaggerOperation(Summary = "Completes a task")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Complete(Guid id, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new CompleteTaskCommand(id, userId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(NoContent(), error => this.ToActionResult(error));
+        }
+
+        [HttpDelete("{id:guid}")]
+        [SwaggerOperation(Summary = "Cancels a task")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Cancel(Guid id, CancellationToken ct)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new CancelTaskCommand(id, userId);
+            var result = await _mediator.Send(command, ct);
+
+            return result.Match(NoContent(), error => this.ToActionResult(error));
+        }
+
+        private Guid GetUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(claim) || !Guid.TryParse(claim, out var userId))
+            {
+                return Guid.Empty;
+            }
+
+            return userId;
+        }
+    }
+}

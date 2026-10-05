@@ -8,24 +8,24 @@ var usersDb = builder.AddPostgres("users-db")
     .WithPgAdmin()
     .AddDatabase("UsersDb");
 
-var tasksDb = builder.AddPostgres("tasks-db")
+var workspacesDb = builder.AddPostgres("workspaces-db")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Session)
     .WithPgAdmin()
-    .AddDatabase("TasksDb");
+    .AddDatabase("WorkspacesDb");
 
 var usersApi = builder.AddProject<Projects.Users_API>("users-api")
     .WithReference(usersDb)
     .WaitFor(usersDb);
 
-var tasksApi = builder.AddProject<Projects.Tasks_API>("tasks-api")
-    .WithReference(tasksDb)
-    .WaitFor(tasksDb);
+var workspacesApi = builder.AddProject<Projects.Workspaces_API>("workspaces-api")
+    .WithReference(workspacesDb)
+    .WaitFor(workspacesDb);
 
 var gateway = builder.AddProject<Projects.gateway>("gateway")
     .WithReference(usersApi)
-    .WithReference(tasksApi)
-    .WaitFor(tasksApi)
+    .WithReference(workspacesApi)
+    .WaitFor(workspacesApi)
     .WaitFor(usersApi);
 
 await builder.Build().RunAsync();
