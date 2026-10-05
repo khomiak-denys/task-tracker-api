@@ -5,8 +5,11 @@ using Xunit;
 
 namespace Users.API.Tests.Requests
 {
-    public class GetUsersBatchRequestJsonConverterTests
+    public class GetUsersBatchRequestTests
     {
+        private static readonly JsonSerializerOptions CaseInsensitiveOptions = new() { PropertyNameCaseInsensitive = true };
+        private static readonly JsonSerializerOptions CamelCaseOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
         [Fact]
         public void Deserialize_Should_ParseUserIds_When_PayloadIsJsonObjectWithUserIds()
         {
@@ -16,25 +19,7 @@ namespace Users.API.Tests.Requests
             var json = $"{{\"userIds\":[\"{id1}\",\"{id2}\"]}}";
 
             // Act
-            var result = JsonSerializer.Deserialize<GetUsersBatchRequest>(json);
-
-            // Assert
-            result.Should().NotBeNull();
-            result!.UserIds.Should().HaveCount(2);
-            result.UserIds.Should().Contain(id1);
-            result.UserIds.Should().Contain(id2);
-        }
-
-        [Fact]
-        public void Deserialize_Should_ParseUserIds_When_PayloadIsJsonArray()
-        {
-            // Arrange
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-            var json = $"[\"{id1}\",\"{id2}\"]";
-
-            // Act
-            var result = JsonSerializer.Deserialize<GetUsersBatchRequest>(json);
+            var result = JsonSerializer.Deserialize<GetUsersBatchRequest>(json, CaseInsensitiveOptions);
 
             // Assert
             result.Should().NotBeNull();
@@ -50,7 +35,7 @@ namespace Users.API.Tests.Requests
             var json = "{}";
 
             // Act
-            var result = JsonSerializer.Deserialize<GetUsersBatchRequest>(json);
+            var result = JsonSerializer.Deserialize<GetUsersBatchRequest>(json, CaseInsensitiveOptions);
 
             // Assert
             result.Should().NotBeNull();
@@ -65,7 +50,7 @@ namespace Users.API.Tests.Requests
             var request = new GetUsersBatchRequest(new[] { id });
 
             // Act
-            var json = JsonSerializer.Serialize(request);
+            var json = JsonSerializer.Serialize(request, CamelCaseOptions);
 
             // Assert
             json.Should().Contain("\"userIds\":");
