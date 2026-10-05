@@ -62,6 +62,48 @@ namespace Users.Infrastructure.Services
             return Result<UserContactInfoResult>.Success(dto);
         }
 
+        public async Task<Result<PaginationResult<UserContactInfoResult>>> GetContactInfoBatchAsync(
+            IReadOnlyCollection<Guid> userIds,
+            int page,
+            int pageSize,
+            CancellationToken ct)
+        {
+            var effectivePage = page < 1 ? 1 : page;
+            var effectivePageSize = pageSize < 1 ? 10 : pageSize;
+
+            if (userIds == null || userIds.Count == 0)
+            {
+                var emptyResult = PaginationResult<UserContactInfoResult>.Create(
+                    Array.Empty<UserContactInfoResult>(),
+                    effectivePage,
+                    effectivePageSize,
+                    0);
+                return Result<PaginationResult<UserContactInfoResult>>.Success(emptyResult);
+            }
+
+            var distinctIds = userIds.Distinct().ToList();
+
+            var query = _dbContext.Users
+                .AsNoTracking()
+                .Where(u => distinctIds.Contains(u.Id));
+
+            var totalCount = await query.CountAsync(ct);
+
+            var users = await query
+                .OrderBy(u => u.UserName)
+                .Skip((effectivePage - 1) * effectivePageSize)
+                .Take(effectivePageSize)
+                .Select(u => new UserContactInfoResult(
+                    u.Id,
+                    u.Email ?? string.Empty,
+                    u.UserName ?? string.Empty,
+                    u.FullName))
+                .ToListAsync(ct);
+
+            var result = PaginationResult<UserContactInfoResult>.Create(users, effectivePage, effectivePageSize, totalCount);
+            return Result<PaginationResult<UserContactInfoResult>>.Success(result);
+        }
+
         public async Task<Result<PaginationResult<UserResult>>> GetAllAsync(int page, int pageSize, CancellationToken ct)
         {
             var query = _dbContext.Users.AsNoTracking();

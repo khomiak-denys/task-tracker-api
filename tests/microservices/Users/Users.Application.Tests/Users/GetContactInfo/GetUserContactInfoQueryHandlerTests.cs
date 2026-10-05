@@ -74,6 +74,13 @@ namespace Users.Application.Tests.Users.GetContactInfo
                 return Task.FromResult(Result<UserContactInfoResult>.Failure(new NotFoundError("User not found")));
             }
 
+            public Task<Result<PaginationResult<UserContactInfoResult>>> GetContactInfoBatchAsync(
+                IReadOnlyCollection<Guid> userIds,
+                int page,
+                int pageSize,
+                CancellationToken ct) =>
+                throw new NotImplementedException();
+
             public Task<Result<UserProfileResult>> GetByIdAsync(Guid userId, CancellationToken ct) =>
                 throw new NotImplementedException();
 
