@@ -283,6 +283,62 @@
       "description": "Endpoints for retrieving, updating, and managing user profiles.",
       "item": [
         {
+          "name": "Get Users Batch (Integration API Key)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}",
+                "type": "text",
+                "description": "Integration API Key for service-to-service communication"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userIds\": [\n    \"{{userId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usersBaseUrl}}/api/v1/users/batch?page=1&pageSize=10",
+              "host": [
+                "{{usersBaseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "batch"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default 1)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "Page size (default 10)"
+                }
+              ]
+            },
+            "description": "Retrieves paginated contact information for a batch of user IDs using Integration API Key authentication."
+          },
+          "response": []
+        },
+        {
           "name": "Get All Users",
           "request": {
             "method": "GET",

@@ -16,6 +16,20 @@ namespace Users.Application.Interfaces
         /// <returns>The user's contact information if found; otherwise, a failure result.</returns>
         Task<Result<UserContactInfoResult>> GetContactInfoByIdAsync(Guid userId, CancellationToken ct);
 
+        /// <summary>
+        /// Retrieves paginated contact information for a collection of user identifiers.
+        /// </summary>
+        /// <param name="userIds">The collection of user identifiers.</param>
+        /// <param name="page">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns>A paginated list of user contact information.</returns>
+        Task<Result<PaginationResult<UserContactInfoResult>>> GetContactInfoBatchAsync(
+            IReadOnlyCollection<Guid> userIds,
+            int page,
+            int pageSize,
+            CancellationToken ct);
+
         Task<Result<PaginationResult<UserResult>>> GetAllAsync(int page, int pageSize, CancellationToken ct);
         Task<Result> UpdateProfileAsync(Guid userId, string? fullName, string? userName, CancellationToken ct);
         Task<Result> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword, CancellationToken ct);
