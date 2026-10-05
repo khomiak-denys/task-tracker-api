@@ -5,29 +5,46 @@ using TaskStatus = Workspaces.Domain.Tasks.TaskStatus;
 
 namespace Workspaces.Domain.Tasks
 {
+    /// <summary>
+    /// Represents a work item or task within a workspace.
+    /// Inherits auditing fields (Id, CreatedAt, UpdatedAt) from <see cref="EntityBase"/>.
+    /// </summary>
     public class TaskItem : EntityBase
     {
+        /// <summary>Gets the unique identifier of the workspace this task belongs to.</summary>
+        public Guid WorkspaceId { get; private set; }
+
+        /// <summary>Gets the title of the task.</summary>
         public string Title { get; private set; } = null!;
 
+        /// <summary>Gets the optional description of the task.</summary>
         public string? Description { get; private set; }
 
+        /// <summary>Gets the current workflow status of the task.</summary>
         public TaskStatus Status { get; private set; }
 
+        /// <summary>Gets the priority level of the task.</summary>
         public Priority Priority { get; private set; }
 
+        /// <summary>Gets the optional deadline date and time for the task.</summary>
         public DateTime? Deadline { get; private set; }
 
+        /// <summary>Gets the unique identifier of the user assigned to this task, if any.</summary>
         public Guid? AssigneeId { get; private set; }
 
+        /// <summary>Gets the unique identifier of the user who created this task.</summary>
         public Guid CreatedById { get; private set; }
 
+        /// <summary>Gets the collection of time logs recorded against this task.</summary>
         public ICollection<TimeLog> TimeLogs { get; private set; } = new List<TimeLog>();
 
+        /// <summary>Gets the collection of tag join entities associated with this task.</summary>
         public ICollection<TaskTag> TaskTags { get; private set; } = new List<TaskTag>();
 
         private TaskItem() { }
 
         private TaskItem(
+            Guid workspaceId,
             string title,
             string? description,
             Priority priority,
@@ -35,6 +52,7 @@ namespace Workspaces.Domain.Tasks
             Guid? assigneeId,
             Guid createdById)
         {
+            WorkspaceId = workspaceId;
             Title = title;
             Description = description;
             Priority = priority;
@@ -44,7 +62,19 @@ namespace Workspaces.Domain.Tasks
             Status = TaskStatus.Todo;
         }
 
+        /// <summary>
+        /// Factory method to create a new <see cref="TaskItem"/> bound to a workspace.
+        /// </summary>
+        /// <param name="workspaceId">The workspace identifier.</param>
+        /// <param name="title">Non-empty task title.</param>
+        /// <param name="description">Optional task description.</param>
+        /// <param name="priority">Task priority level.</param>
+        /// <param name="deadline">Optional deadline.</param>
+        /// <param name="assigneeId">Optional assignee user identifier.</param>
+        /// <param name="createdById">The creator user identifier.</param>
+        /// <returns>A new <see cref="TaskItem"/> instance in 'Todo' status.</returns>
         public static TaskItem Create(
+            Guid workspaceId,
             string title,
             string? description,
             Priority priority,
@@ -52,11 +82,28 @@ namespace Workspaces.Domain.Tasks
             Guid? assigneeId,
             Guid createdById)
         {
-            var task = new TaskItem(title, description, priority, deadline, assigneeId, createdById);
+            var task = new TaskItem(workspaceId, title, description, priority, deadline, assigneeId, createdById);
             task.OnCreate();
             return task;
         }
 
+        /// <summary>
+        /// Moves the task to a different workspace.
+        /// </summary>
+        /// <param name="workspaceId">The target workspace identifier.</param>
+        public void MoveToWorkspace(Guid workspaceId)
+        {
+            WorkspaceId = workspaceId;
+            OnModify();
+        }
+
+        /// <summary>
+        /// Updates mutable task fields.
+        /// </summary>
+        /// <param name="title">New title.</param>
+        /// <param name="description">New description.</param>
+        /// <param name="priority">New priority.</param>
+        /// <param name="deadline">New deadline.</param>
         public void Update(string title, string? description, Priority priority, DateTime? deadline)
         {
             Title = title;
@@ -66,12 +113,21 @@ namespace Workspaces.Domain.Tasks
             OnModify();
         }
 
+        /// <summary>
+        /// Assigns the task to a user.
+        /// </summary>
+        /// <param name="assigneeId">The user identifier to assign.</param>
         public void Assign(Guid assigneeId)
         {
             AssigneeId = assigneeId;
             OnModify();
         }
 
+        /// <summary>
+        /// Transitions the workflow status of the task.
+        /// </summary>
+        /// <param name="newStatus">Target status.</param>
+        /// <returns>Success or validation failure result.</returns>
         public Result ChangeStatus(TaskStatus newStatus)
         {
             var allowed = Status switch
@@ -92,6 +148,13 @@ namespace Workspaces.Domain.Tasks
             return Result.Success();
         }
 
+        /// <summary>
+        /// Logs time spent on the task.
+        /// </summary>
+        /// <param name="userId">The logging user identifier.</param>
+        /// <param name="minutesSpent">Number of minutes spent.</param>
+        /// <param name="description">Optional description of work done.</param>
+        /// <param name="loggedDate">Date when the work was done.</param>
         public void LogTime(Guid userId, int minutesSpent, string? description, DateOnly loggedDate)
         {
             var log = TimeLog.Create(Id, userId, minutesSpent, description, loggedDate);
@@ -99,6 +162,10 @@ namespace Workspaces.Domain.Tasks
             OnModify();
         }
 
+        /// <summary>
+        /// Marks the task as completed ('Done').
+        /// </summary>
+        /// <returns>Success or validation failure result.</returns>
         public Result Complete()
         {
             if (Status != TaskStatus.InReview)
@@ -111,6 +178,10 @@ namespace Workspaces.Domain.Tasks
             return Result.Success();
         }
 
+        /// <summary>
+        /// Cancels the task.
+        /// </summary>
+        /// <returns>Success or validation failure result.</returns>
         public Result Cancel()
         {
             if (Status == TaskStatus.Done)

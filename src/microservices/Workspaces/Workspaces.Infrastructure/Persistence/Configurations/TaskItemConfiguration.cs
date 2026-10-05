@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Workspaces.Domain.Tasks;
+using Workspaces.Domain.Workspaces;
 
 namespace Workspaces.Infrastructure.Persistence.Configurations
 {
@@ -18,6 +19,16 @@ namespace Workspaces.Infrastructure.Persistence.Configurations
             builder.ToTable("Tasks");
 
             builder.HasKey(t => t.Id);
+
+            builder.Property(t => t.WorkspaceId)
+                .IsRequired();
+
+            builder.HasIndex(t => t.WorkspaceId);
+
+            builder.HasOne<Workspace>()
+                .WithMany()
+                .HasForeignKey(t => t.WorkspaceId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.Title)
                 .HasMaxLength(200)

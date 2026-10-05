@@ -5,8 +5,9 @@ using Priority = Workspaces.Domain.Tasks.Priority;
 namespace Workspaces.Application.Tasks.Create
 {
     /// <summary>
-    /// Command to create a new task.
+    /// Command to create a new task bound to a workspace.
     /// </summary>
+    /// <param name="WorkspaceId">Id of the workspace the task belongs to.</param>
     /// <param name="CreatedById">Id of the authenticated user creating the task.</param>
     /// <param name="Title">Non-empty title (max 200 chars).</param>
     /// <param name="Description">Optional description.</param>
@@ -15,6 +16,7 @@ namespace Workspaces.Application.Tasks.Create
     /// <param name="AssigneeId">Optional user id to assign the task to.</param>
     /// <param name="TagNames">Set of tag names to associate with the task.</param>
     public record CreateTaskCommand(
+        Guid WorkspaceId,
         Guid CreatedById,
         string Title,
         string? Description,
