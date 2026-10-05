@@ -1,6 +1,7 @@
 using DomainFramework;
 using Microsoft.EntityFrameworkCore;
 using Workspaces.Domain.Tasks;
+using TaskStatus = Workspaces.Domain.Tasks.TaskStatus;
 
 namespace Workspaces.Infrastructure.Persistence.Repositories
 {
@@ -27,13 +28,63 @@ namespace Workspaces.Infrastructure.Persistence.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<PaginationResult<TaskItem>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PaginationResult<TaskItem>> GetAllAsync(
+            Guid? workspaceId,
+            string? search,
+            TaskStatus? status,
+            Priority? priority,
+            Guid? assigneeId,
+            Guid? createdById,
+            string? tag,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken)
         {
             var query = _context.Tasks
                 .Include(t => t.TaskTags)
                     .ThenInclude(tt => tt.Tag)
-                .AsNoTracking()
-                .OrderByDescending(t => t.CreatedAt);
+                .AsNoTracking();
+
+            if (workspaceId.HasValue && workspaceId.Value != Guid.Empty)
+            {
+                query = query.Where(t => t.WorkspaceId == workspaceId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var trimmed = search.Trim();
+                query = query.Where(t =>
+                    EF.Functions.ILike(t.Title, $"%{trimmed}%") ||
+                    (t.Description != null && EF.Functions.ILike(t.Description, $"%{trimmed}%")));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(t => t.Status == status.Value);
+            }
+
+            if (priority.HasValue)
+            {
+                query = query.Where(t => t.Priority == priority.Value);
+            }
+
+            if (assigneeId.HasValue)
+            {
+                query = query.Where(t => t.AssigneeId == assigneeId.Value);
+            }
+
+            if (createdById.HasValue)
+            {
+                query = query.Where(t => t.CreatedById == createdById.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                var trimmedTag = tag.Trim();
+                query = query.Where(t => t.TaskTags.Any(tt => tt.Tag != null && EF.Functions.ILike(tt.Tag.Name, $"%{trimmedTag}%")));
+            }
+
+            query = query.OrderByDescending(t => t.CreatedAt);
 
             var totalCount = await query.CountAsync(cancellationToken);
             var items = await query
@@ -45,7 +96,16 @@ namespace Workspaces.Infrastructure.Persistence.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<PaginationResult<TaskItem>> GetMyAsync(Guid userId, string? type, int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PaginationResult<TaskItem>> GetMyAsync(
+            Guid userId,
+            string? type,
+            string? search,
+            TaskStatus? status,
+            Priority? priority,
+            string? tag,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken)
         {
             var query = _context.Tasks
                 .Include(t => t.TaskTags)
@@ -62,7 +122,32 @@ namespace Workspaces.Infrastructure.Persistence.Repositories
             }
             else
             {
+                // 'all', null, empty, or default: user is either creator or assignee
                 query = query.Where(t => t.CreatedById == userId || t.AssigneeId == userId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var trimmed = search.Trim();
+                query = query.Where(t =>
+                    EF.Functions.ILike(t.Title, $"%{trimmed}%") ||
+                    (t.Description != null && EF.Functions.ILike(t.Description, $"%{trimmed}%")));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(t => t.Status == status.Value);
+            }
+
+            if (priority.HasValue)
+            {
+                query = query.Where(t => t.Priority == priority.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                var trimmedTag = tag.Trim();
+                query = query.Where(t => t.TaskTags.Any(tt => tt.Tag != null && EF.Functions.ILike(tt.Tag.Name, $"%{trimmedTag}%")));
             }
 
             query = query.OrderByDescending(t => t.CreatedAt);
@@ -87,6 +172,14 @@ namespace Workspaces.Infrastructure.Persistence.Repositories
         {
             _context.Tasks.Remove(task);
             return Task.CompletedTask;
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> GetCountByWorkspaceAsync(Guid workspaceId, CancellationToken cancellationToken)
+        {
+            return await _context.Tasks
+                .AsNoTracking()
+                .CountAsync(t => t.WorkspaceId == workspaceId, cancellationToken);
         }
     }
 }
