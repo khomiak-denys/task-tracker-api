@@ -29,6 +29,7 @@ namespace Workspaces.Application.Tasks.Create
         public async Task<Result<Guid>> Handle(CreateTaskCommand command, CancellationToken cancellationToken)
         {
             var task = TaskItem.Create(
+                command.WorkspaceId,
                 command.Title,
                 command.Description,
                 command.Priority,

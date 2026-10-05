@@ -7,6 +7,7 @@ namespace Workspaces.Application.Tasks.DTOs
     /// Represents a task summary item for list projections.
     /// </summary>
     /// <param name="Id">The unique identifier of the task.</param>
+    /// <param name="WorkspaceId">The unique identifier of the workspace the task belongs to.</param>
     /// <param name="Title">The title of the task.</param>
     /// <param name="Description">The optional description of the task.</param>
     /// <param name="Status">The current workflow status of the task.</param>
@@ -16,6 +17,7 @@ namespace Workspaces.Application.Tasks.DTOs
     /// <param name="Tags">The list of tag names associated with the task.</param>
     public record TaskResult(
         Guid Id,
+        Guid WorkspaceId,
         string Title,
         string? Description,
         TaskStatus Status,

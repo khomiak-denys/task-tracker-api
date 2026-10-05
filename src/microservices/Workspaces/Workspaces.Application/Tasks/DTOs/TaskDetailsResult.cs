@@ -7,6 +7,7 @@ namespace Workspaces.Application.Tasks.DTOs
     /// Represents the full details of a task, including time logs and assignees.
     /// </summary>
     /// <param name="Id">The unique identifier of the task.</param>
+    /// <param name="WorkspaceId">The unique identifier of the workspace the task belongs to.</param>
     /// <param name="Title">The title of the task.</param>
     /// <param name="Description">The optional description of the task.</param>
     /// <param name="Status">The current workflow status of the task.</param>
@@ -20,6 +21,7 @@ namespace Workspaces.Application.Tasks.DTOs
     /// <param name="TimeLogs">The list of time logs logged against the task.</param>
     public record TaskDetailsResult(
         Guid Id,
+        Guid WorkspaceId,
         string Title,
         string? Description,
         TaskStatus Status,

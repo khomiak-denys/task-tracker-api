@@ -4,6 +4,7 @@ using Workspaces.Domain.Tasks;
 namespace Workspaces.API.Tasks.Requests
 {
     public record CreateTaskRequest(
+        Guid WorkspaceId,
         string Title,
         string? Description,
         Priority Priority,
@@ -14,6 +15,7 @@ namespace Workspaces.API.Tasks.Requests
         public CreateTaskCommand ToCommand(Guid createdById)
         {
             return new CreateTaskCommand(
+                WorkspaceId,
                 createdById,
                 Title,
                 Description,

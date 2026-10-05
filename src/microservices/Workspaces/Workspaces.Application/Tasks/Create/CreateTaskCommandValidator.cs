@@ -8,6 +8,9 @@ namespace Workspaces.Application.Tasks.Create
         /// <summary>Initializes a new instance of <see cref="CreateTaskCommandValidator"/>.</summary>
         public CreateTaskCommandValidator()
         {
+            RuleFor(x => x.WorkspaceId)
+                .NotEmpty().WithMessage("WorkspaceId is required.");
+
             RuleFor(x => x.CreatedById)
                 .NotEmpty().WithMessage("CreatedById is required.");
 
