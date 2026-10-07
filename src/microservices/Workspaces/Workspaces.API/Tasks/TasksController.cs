@@ -30,23 +30,30 @@ namespace Workspaces.API.Tasks
         }
 
         [HttpGet]
-        [SwaggerOperation(Summary = "Gets all tasks with pagination")]
+        [SwaggerOperation(Summary = "Gets all tasks with optional filters and pagination")]
         [ProducesResponseType(typeof(PaginationResult<TaskResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] GetAllTasksRequest? request = null,
+            CancellationToken ct = default)
         {
-            var query = new GetAllTasksQuery(page, pageSize);
+            var filter = request ?? new GetAllTasksRequest();
+            var userId = GetUserId();
+            var query = filter.ToQuery(userId == Guid.Empty ? null : userId);
             var result = await _mediator.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));
         }
 
         [HttpGet("my")]
-        [SwaggerOperation(Summary = "Gets the current user's tasks with pagination")]
+        [SwaggerOperation(Summary = "Gets the current user's tasks with optional filters and pagination")]
         [ProducesResponseType(typeof(PaginationResult<TaskResult>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetMy([FromQuery] string? type = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        public async Task<IActionResult> GetMy(
+            [FromQuery] GetMyTasksRequest? request = null,
+            CancellationToken ct = default)
         {
             var userId = GetUserId();
             if (userId == Guid.Empty)
@@ -54,7 +61,8 @@ namespace Workspaces.API.Tasks
                 return Unauthorized();
             }
 
-            var query = new GetMyTasksQuery(userId, type, page, pageSize);
+            var filter = request ?? new GetMyTasksRequest();
+            var query = filter.ToQuery(userId);
             var result = await _mediator.Send(query, ct);
 
             return result.Match(Ok(result.Value), error => this.ToActionResult(error));

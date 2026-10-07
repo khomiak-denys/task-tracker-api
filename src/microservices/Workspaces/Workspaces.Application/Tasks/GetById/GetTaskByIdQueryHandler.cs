@@ -62,6 +62,7 @@ namespace Workspaces.Application.Tasks.GetById
 
             var result = new TaskDetailsResult(
                 task.Id,
+                task.WorkspaceId,
                 task.Title,
                 task.Description,
                 task.Status,

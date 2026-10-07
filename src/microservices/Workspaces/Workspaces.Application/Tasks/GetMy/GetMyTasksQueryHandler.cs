@@ -3,6 +3,7 @@ using DomainFramework.Results;
 using Messaging.Abstractions;
 using Workspaces.Application.Tasks.DTOs;
 using Workspaces.Domain.Tasks;
+using TaskStatus = Workspaces.Domain.Tasks.TaskStatus;
 
 namespace Workspaces.Application.Tasks.GetMy
 {
@@ -20,9 +21,21 @@ namespace Workspaces.Application.Tasks.GetMy
 
         public async Task<Result<PaginationResult<TaskResult>>> Handle(GetMyTasksQuery query, CancellationToken cancellationToken)
         {
+            TaskStatus? status = !string.IsNullOrWhiteSpace(query.Status) && !query.Status.Equals("all", StringComparison.OrdinalIgnoreCase) && Enum.TryParse<TaskStatus>(query.Status, true, out var parsedStatus)
+                ? parsedStatus
+                : null;
+
+            Priority? priority = !string.IsNullOrWhiteSpace(query.Priority) && !query.Priority.Equals("all", StringComparison.OrdinalIgnoreCase) && Enum.TryParse<Priority>(query.Priority, true, out var parsedPriority)
+                ? parsedPriority
+                : null;
+
             var pagedTasks = await _taskRepository.GetMyAsync(
                 query.UserId,
                 query.Type,
+                query.Search,
+                status,
+                priority,
+                query.Tag,
                 query.Page,
                 query.PageSize,
                 cancellationToken);
@@ -30,6 +43,7 @@ namespace Workspaces.Application.Tasks.GetMy
             var items = pagedTasks.Items
                 .Select(task => new TaskResult(
                     task.Id,
+                    task.WorkspaceId,
                     task.Title,
                     task.Description,
                     task.Status,

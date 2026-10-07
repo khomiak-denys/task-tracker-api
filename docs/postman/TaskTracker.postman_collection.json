@@ -679,6 +679,48 @@
               ],
               "query": [
                 {
+                  "key": "search",
+                  "value": "",
+                  "description": "Optional search term matching task title or description",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "Todo",
+                  "description": "Optional task status (Todo, InProgress, InReview, Done, Cancelled, or all)",
+                  "disabled": true
+                },
+                {
+                  "key": "priority",
+                  "value": "High",
+                  "description": "Optional task priority (Low, Medium, High, Critical, or all)",
+                  "disabled": true
+                },
+                {
+                  "key": "assigneeId",
+                  "value": "",
+                  "description": "Optional assignee user ID filter",
+                  "disabled": true
+                },
+                {
+                  "key": "createdById",
+                  "value": "",
+                  "description": "Optional creator user ID filter",
+                  "disabled": true
+                },
+                {
+                  "key": "tag",
+                  "value": "",
+                  "description": "Optional tag name filter",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "all",
+                  "description": "Optional filter type ('all', 'created', 'assigned')",
+                  "disabled": true
+                },
+                {
                   "key": "page",
                   "value": "1",
                   "description": "Page index (1-based)"
@@ -690,7 +732,7 @@
                 }
               ]
             },
-            "description": "Retrieves a paginated list of all tasks."
+            "description": "Retrieves a paginated list of all tasks matching optional filter criteria."
           },
           "response": []
         },
@@ -700,7 +742,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{tasksBaseUrl}}/api/v1/tasks/my?type=assigned&page=1&pageSize=10",
+              "raw": "{{tasksBaseUrl}}/api/v1/tasks/my?type=all&page=1&pageSize=10",
               "host": [
                 "{{tasksBaseUrl}}"
               ],
@@ -713,8 +755,32 @@
               "query": [
                 {
                   "key": "type",
-                  "value": "assigned",
-                  "description": "Task filter type (e.g. 'assigned' or 'created')"
+                  "value": "all",
+                  "description": "Task filter type: 'all', 'assigned', or 'created'"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Optional search term matching task title or description",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "InProgress",
+                  "description": "Optional task status (Todo, InProgress, InReview, Done, Cancelled, or all)",
+                  "disabled": true
+                },
+                {
+                  "key": "priority",
+                  "value": "Medium",
+                  "description": "Optional task priority (Low, Medium, High, Critical, or all)",
+                  "disabled": true
+                },
+                {
+                  "key": "tag",
+                  "value": "",
+                  "description": "Optional tag name filter",
+                  "disabled": true
                 },
                 {
                   "key": "page",
@@ -728,7 +794,7 @@
                 }
               ]
             },
-            "description": "Gets tasks related to the authenticated user (created or assigned)."
+            "description": "Gets tasks related to the authenticated user (created, assigned, or all) with optional filters."
           },
           "response": []
         },

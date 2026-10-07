@@ -5,6 +5,7 @@ using Workspaces.Application.Abstractions;
 using Workspaces.Application.Tasks.DTOs;
 using Workspaces.Application.Tasks.GetById;
 using Workspaces.Domain.Tasks;
+using TaskStatus = Workspaces.Domain.Tasks.TaskStatus;
 using Xunit;
 
 namespace Workspaces.Application.Tests.Tasks.GetById
@@ -42,7 +43,7 @@ namespace Workspaces.Application.Tests.Tasks.GetById
             var assigneeId = Guid.NewGuid();
             var unauthorizedUserId = Guid.NewGuid();
 
-            var task = TaskItem.Create("Title", "Description", Priority.Medium, null, assigneeId, creatorId);
+            var task = TaskItem.Create(Guid.NewGuid(), "Title", "Description", Priority.Medium, null, assigneeId, creatorId);
             _taskRepository.TaskToReturn = task;
 
             var query = new GetTaskByIdQuery(task.Id, unauthorizedUserId, false);
@@ -62,7 +63,7 @@ namespace Workspaces.Application.Tests.Tasks.GetById
             var creatorId = Guid.NewGuid();
             var assigneeId = Guid.NewGuid();
 
-            var task = TaskItem.Create("Test Task", "Test Desc", Priority.High, DateTime.UtcNow.AddDays(3), assigneeId, creatorId);
+            var task = TaskItem.Create(Guid.NewGuid(), "Test Task", "Test Desc", Priority.High, DateTime.UtcNow.AddDays(3), assigneeId, creatorId);
             _taskRepository.TaskToReturn = task;
 
             var creatorResult = new UserResult(creatorId, "creator@test.com", "creator_user", "Creator User");
@@ -95,7 +96,7 @@ namespace Workspaces.Application.Tests.Tasks.GetById
             var creatorId = Guid.NewGuid();
             var adminId = Guid.NewGuid();
 
-            var task = TaskItem.Create("Admin Task", null, Priority.Low, null, null, creatorId);
+            var task = TaskItem.Create(Guid.NewGuid(), "Admin Task", null, Priority.Low, null, null, creatorId);
             _taskRepository.TaskToReturn = task;
 
             var creatorResult = new UserResult(creatorId, "creator@test.com", "creator", "Creator");
@@ -124,10 +125,29 @@ namespace Workspaces.Application.Tests.Tasks.GetById
             public Task AddAsync(TaskItem task, CancellationToken cancellationToken) => Task.CompletedTask;
             public Task RemoveAsync(TaskItem task, CancellationToken cancellationToken) => Task.CompletedTask;
 
-            public Task<PaginationResult<TaskItem>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken) =>
+            public Task<PaginationResult<TaskItem>> GetAllAsync(
+                Guid? workspaceId,
+                string? search,
+                TaskStatus? status,
+                Priority? priority,
+                Guid? assigneeId,
+                Guid? createdById,
+                string? tag,
+                int page,
+                int pageSize,
+                CancellationToken cancellationToken) =>
                 Task.FromResult(PaginationResult<TaskItem>.Create(Array.Empty<TaskItem>(), page, pageSize, 0));
 
-            public Task<PaginationResult<TaskItem>> GetMyAsync(Guid userId, string? type, int page, int pageSize, CancellationToken cancellationToken) =>
+            public Task<PaginationResult<TaskItem>> GetMyAsync(
+                Guid userId,
+                string? type,
+                string? search,
+                TaskStatus? status,
+                Priority? priority,
+                string? tag,
+                int page,
+                int pageSize,
+                CancellationToken cancellationToken) =>
                 Task.FromResult(PaginationResult<TaskItem>.Create(Array.Empty<TaskItem>(), page, pageSize, 0));
         }
 

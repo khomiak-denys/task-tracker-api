@@ -3,11 +3,12 @@ using DomainFramework.Results;
 using Messaging.Abstractions;
 using Workspaces.Application.Tasks.DTOs;
 using Workspaces.Domain.Tasks;
+using TaskStatus = Workspaces.Domain.Tasks.TaskStatus;
 
 namespace Workspaces.Application.Tasks.GetAll
 {
     /// <summary>
-    /// Handles <see cref="GetAllTasksQuery"/> — retrieves paged tasks.
+    /// Handles <see cref="GetAllTasksQuery"/> — retrieves paged tasks matching filters.
     /// </summary>
     internal sealed class GetAllTasksQueryHandler : IQueryHandler<GetAllTasksQuery, Result<PaginationResult<TaskResult>>>
     {
@@ -20,7 +21,37 @@ namespace Workspaces.Application.Tasks.GetAll
 
         public async Task<Result<PaginationResult<TaskResult>>> Handle(GetAllTasksQuery query, CancellationToken cancellationToken)
         {
+            TaskStatus? status = !string.IsNullOrWhiteSpace(query.Status) && !query.Status.Equals("all", StringComparison.OrdinalIgnoreCase) && Enum.TryParse<TaskStatus>(query.Status, true, out var parsedStatus)
+                ? parsedStatus
+                : null;
+
+            Priority? priority = !string.IsNullOrWhiteSpace(query.Priority) && !query.Priority.Equals("all", StringComparison.OrdinalIgnoreCase) && Enum.TryParse<Priority>(query.Priority, true, out var parsedPriority)
+                ? parsedPriority
+                : null;
+
+            Guid? effectiveAssigneeId = query.AssigneeId;
+            Guid? effectiveCreatedById = query.CreatedById;
+
+            if (query.RequestingUserId.HasValue && query.RequestingUserId.Value != Guid.Empty && !string.IsNullOrWhiteSpace(query.Type))
+            {
+                if (query.Type.Equals("assigned", StringComparison.OrdinalIgnoreCase))
+                {
+                    effectiveAssigneeId = query.RequestingUserId.Value;
+                }
+                else if (query.Type.Equals("created", StringComparison.OrdinalIgnoreCase))
+                {
+                    effectiveCreatedById = query.RequestingUserId.Value;
+                }
+            }
+
             var pagedTasks = await _taskRepository.GetAllAsync(
+                query.WorkspaceId,
+                query.Search,
+                status,
+                priority,
+                effectiveAssigneeId,
+                effectiveCreatedById,
+                query.Tag,
                 query.Page,
                 query.PageSize,
                 cancellationToken);
@@ -28,6 +59,7 @@ namespace Workspaces.Application.Tasks.GetAll
             var items = pagedTasks.Items
                 .Select(task => new TaskResult(
                     task.Id,
+                    task.WorkspaceId,
                     task.Title,
                     task.Description,
                     task.Status,
